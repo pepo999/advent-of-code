@@ -1,5 +1,6 @@
-###############################
-# 1
+#####
+# 1 #
+#####
 
 lines = []
 with open('data/input_1.txt') as f: 
@@ -21,10 +22,11 @@ def get_digit(line):
             return char
     return None
     
-print(get_first_get_last(lines))
+print('Solution n°1: ', get_first_get_last(lines))
 
-###############################
-# 2
+#####
+# 2 #
+#####
 
 lines = []
 with open('data/input_2.txt') as f: 
@@ -56,10 +58,11 @@ def get_id_sum(lines):
             res.append(int(id))
     return sum(res)
                  
-print(get_id_sum(lines))
+print('Solution n°2: ', get_id_sum(lines))
 
-###############################
-# 3
+#####
+# 3 #
+#####
 
 import re
 
@@ -67,19 +70,6 @@ lines = []
 with open('data/input_3.txt') as f: 
     for _ in f:
         lines.append(_)
-
-# lines = [
-#         '467..114..',
-#         '...*......',
-#         '..35..633.',
-#         '......#...',
-#         '617*......',
-#         '.....+.58.',
-#         '..592.....',
-#         '......755.',
-#         '...$.*....',
-#         '.664.598..'
-#         ]
 
 def nums_near_symb(lines):
     count_lines = len(lines)
@@ -98,7 +88,6 @@ def nums_near_symb(lines):
         index_symb_curr = get_index_symb(line)
         index_symb_next = get_index_symb(next_line)
         grouped_indexes = group_indexes(positions)
-        print(grouped_indexes)
         tot_symb_indexes = index_symb_prev + index_symb_curr + index_symb_next
         for num, indexes in zip(nums, grouped_indexes):
             adj = False
@@ -108,20 +97,21 @@ def nums_near_symb(lines):
                         adj = True
             if adj == True:
                 adj_nums.append(num)
-    adj_nums = set(adj_nums)
-    return sum(list(adj_nums))
+    return sum(adj_nums)
                                 
 def get_nums_and_pos(line):
     position_nums = []
     nums_in_line = []
     num_line = ''
     for pos, char in enumerate(line):
-            if char.isdigit():
-                num_line += char
-                position_nums.append(pos)
-            if char == '.': 
-                nums_in_line.append(num_line)
-                num_line = ''
+        if char.isdigit():
+            num_line += char
+            position_nums.append(pos)
+        pattern = re.compile(r'[^\w\s.]')
+        if char == '.' or pattern.match(char): 
+            nums_in_line.append(num_line)
+            num_line = ''
+    nums_in_line.append(num_line)
     nums_in_line = [int(x) for x in nums_in_line if x != '']  
     return nums_in_line, position_nums  
 
@@ -144,10 +134,9 @@ def group_indexes(nums):
             current_group = [num]
     if current_group:
         grouped_nums.append(current_group)
-    grouped_strings = [''.join(map(str, group)) for group in grouped_nums]
-    return grouped_strings       
+    return grouped_nums       
         
-print(nums_near_symb(lines))
+print('Solution n°3: ', nums_near_symb(lines))
 
 
 
