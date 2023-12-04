@@ -138,6 +138,38 @@ def group_indexes(nums):
         
 print('Solution n°3: ', nums_near_symb(lines))
 
+#####
+# 4 #
+#####
+
+lines = []
+with open('data/input_4.txt') as f: 
+    for _ in f:
+        lines.append(_)
+
+def get_points(lines):
+    result = 0
+    for line in lines:
+        values = line.split(': ')[1:]
+        winning = values[0].split('|')[0]
+        winning = winning.split(' ')
+        winning = [x for x in winning if x != '']
+        extracted = values[0].split('|')[1]
+        extracted = extracted.split(' ')
+        extracted = [x.strip() for x in extracted if x != '']
+        points = 0
+        win_count = 0
+        for win_n in winning:
+            if win_n in extracted:
+                win_count += 1
+        if win_count == 0:
+            points = 0
+        elif win_count > 0:
+            points = pow(2, win_count - 1)
+        result += points
+    return result
+            
+print('Solution n°4: ', get_points(lines))
 
 
             
