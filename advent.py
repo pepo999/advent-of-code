@@ -157,7 +157,6 @@ def get_points(lines):
         extracted = values[0].split('|')[1]
         extracted = extracted.split(' ')
         extracted = [x.strip() for x in extracted if x != '']
-        points = 0
         win_count = 0
         for win_n in winning:
             if win_n in extracted:
@@ -170,6 +169,136 @@ def get_points(lines):
     return result
             
 print('Solution n°4: ', get_points(lines))
+
+#####
+# 5 #
+#####
+
+lines = []
+with open('data/input_5.txt') as f: 
+    for _ in f:
+        lines.append(_)
+        
+# lines = [
+#         'seeds: 14',
+
+#         'seed-to-soil map:',
+#         '50 98 2',
+#         '52 50 48',
+
+#         'soil-to-fertilizer map:',
+#         '0 15 37',
+#         '37 52 2',
+#         '39 0 15',
+
+#         'fertilizer-to-water map:',
+#         '49 53 8',
+#         '0 11 42',
+#         '42 0 7',
+#         '57 7 4',
+
+#         'water-to-light map:',
+#         '88 18 7',
+#         '18 25 70',
+
+#         'light-to-temperature map:',
+#         '45 77 23',
+#         '81 45 19',
+#         '68 64 13',
+
+#         'temperature-to-humidity map:',
+#         '0 69 1',
+#         '1 0 69',
+
+#         'humidity-to-location map:',
+#         '60 56 37',
+#         '56 93 4'
+#         ]
+
+seeds = [x for x in lines if 'seeds' in x]
+seeds = seeds[0].replace('seeds: ', '').split(' ')
+seeds = [int(x.strip()) for x in seeds]
+
+print(seeds)
+
+def clean_split(lines):
+    lines_cleaned = []
+    current_label = None
+    for line in lines:
+        line = line.strip()
+        if line.endswith(':'):
+            current_label = line[:-1]
+        else:
+            if line != '':
+                lines_cleaned.append((line, current_label))
+    return [(data, label) for data, label in lines_cleaned if not data[0].isalpha() and not data[0].isspace()]
+                
+lines = clean_split(lines) 
+
+s_to_l = []
+s_to_f = []
+f_to_w = []
+w_to_l = []
+l_to_t = []
+t_to_h = []
+h_to_l = []
+
+for line in lines:
+    if line[1] == 'seed-to-soil map':
+        s_to_l.append(line[0])
+    if line[1] == 'soil-to-fertilizer map':
+        s_to_f.append(line[0])
+    if line[1] == 'fertilizer-to-water map':
+        f_to_w.append(line[0])
+    if line[1] == 'water-to-light map':
+        w_to_l.append(line[0])
+    if line[1] == 'light-to-temperature map':
+        l_to_t.append(line[0])
+    if line[1] == 'temperature-to-humidity map':
+        t_to_h.append(line[0])    
+    if line[1] == 'humidity-to-location map':
+        h_to_l.append(line[0]) 
+
+steps = [
+        s_to_l,
+        s_to_f,
+        f_to_w,
+        w_to_l,
+        l_to_t,
+        t_to_h,
+        h_to_l
+        ]
+
+def through_steps(seed, step):
+    for line in step:
+        splitted_step = line.split(' ')
+        splitted_ints = [int(x) for x in splitted_step]
+        d = splitted_ints[0]
+        s = splitted_ints[1]
+        r = splitted_ints[2]
+        if s <= seed < s + r:
+            seed = seed - s + d
+            return seed
+    return seed
+
+def seed_to_loc(seed):
+        for step in steps:
+            seed = through_steps(seed, step)
+        return seed
+    
+def min_loc(seeds):
+    locs = []
+    for seed in seeds:
+        loc = seed_to_loc(seed)
+        locs.append(loc)
+    return min(locs)
+
+print('Solution n°5: ', min_loc(seeds))
+
+
+
+    
+
 
 
             
