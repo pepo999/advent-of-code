@@ -293,7 +293,7 @@ for time, distance in zip(times, distances):
         push_t += 1
     winning_count *= len(winning_push_list)
         
-print(winning_count)
+print('Solution n°6: ', winning_count)
         
         
 
