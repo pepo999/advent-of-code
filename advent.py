@@ -258,7 +258,7 @@ def min_loc(seeds):
 print('Solution n°5: ', min_loc(seeds))
 
 #####
-# 5 #
+# 6 #
 #####
 
 lines = []
