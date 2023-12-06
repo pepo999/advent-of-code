@@ -178,48 +178,10 @@ lines = []
 with open('data/input_5.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-# lines = [
-#         'seeds: 14',
-
-#         'seed-to-soil map:',
-#         '50 98 2',
-#         '52 50 48',
-
-#         'soil-to-fertilizer map:',
-#         '0 15 37',
-#         '37 52 2',
-#         '39 0 15',
-
-#         'fertilizer-to-water map:',
-#         '49 53 8',
-#         '0 11 42',
-#         '42 0 7',
-#         '57 7 4',
-
-#         'water-to-light map:',
-#         '88 18 7',
-#         '18 25 70',
-
-#         'light-to-temperature map:',
-#         '45 77 23',
-#         '81 45 19',
-#         '68 64 13',
-
-#         'temperature-to-humidity map:',
-#         '0 69 1',
-#         '1 0 69',
-
-#         'humidity-to-location map:',
-#         '60 56 37',
-#         '56 93 4'
-#         ]
 
 seeds = [x for x in lines if 'seeds' in x]
 seeds = seeds[0].replace('seeds: ', '').split(' ')
 seeds = [int(x.strip()) for x in seeds]
-
-print(seeds)
 
 def clean_split(lines):
     lines_cleaned = []
@@ -294,6 +256,47 @@ def min_loc(seeds):
     return min(locs)
 
 print('Solution n°5: ', min_loc(seeds))
+
+#####
+# 5 #
+#####
+
+lines = []
+with open('data/input_6.txt') as f: 
+    for _ in f:
+        lines.append(_)
+
+times = []
+distances = []
+for line in lines:
+    if line.startswith('Time:'):
+        line = line.replace('Time:', '')
+        nums = line.split(' ')
+        nums = [x for x in nums if x != ' ' and x != '']
+        for num in nums:
+            times.append(int(num))
+    if line.startswith('Distance:'):
+        line = line.replace('Distance:', '')
+        nums = line.split(' ')
+        nums = [x for x in nums if x != ' ' and x != '']
+        for num in nums:
+            distances.append(int(num))
+
+winning_count = 1
+for time, distance in zip(times, distances):
+    winning_push_list = []
+    push_t = 0
+    while push_t <= time:
+        dist = push_t * (time - push_t)
+        if dist > distance:
+            winning_push_list.append(dist)
+        push_t += 1
+    winning_count *= len(winning_push_list)
+        
+print(winning_count)
+        
+        
+
 
 
 
