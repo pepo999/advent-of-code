@@ -281,19 +281,80 @@ for line in lines:
         nums = [x for x in nums if x != ' ' and x != '']
         for num in nums:
             distances.append(int(num))
-
-winning_count = 1
-for time, distance in zip(times, distances):
-    winning_push_list = []
-    push_t = 0
-    while push_t <= time:
-        dist = push_t * (time - push_t)
-        if dist > distance:
-            winning_push_list.append(dist)
-        push_t += 1
-    winning_count *= len(winning_push_list)
+            
+def winning_count_mult(times, distances):
+    winning_count = 1
+    for time, distance in zip(times, distances):
+        winning_push_list = []
+        push_t = 0
+        while push_t <= time:
+            dist = push_t * (time - push_t)
+            if dist > distance:
+                winning_push_list.append(dist)
+            push_t += 1
+        winning_count *= len(winning_push_list)
+    return winning_count
         
-print('Solution n°6: ', winning_count)
+print('Solution n°6: ', winning_count_mult(times, distances))
+
+#####
+# 7 #
+#####
+
+from collections import Counter
+
+lines = []
+with open('data/input_7.txt') as f: 
+    for _ in f:
+        lines.append(_)
+
+order_cards = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+order_hand = ['Five of a kind', 'Four of a kind', 'Full house', 'Three of a kind', 'Two pair', 'One pair', 'High card']
+
+def sort_and_count(lines):
+    counted = []
+    for line in lines:
+        hand = line.split(' ')[0]
+        bet = line.split(' ')[1]
+        counter = Counter(hand)
+        count = counter.values()
+        values = []
+        for value in count:
+            values.append(value)
+        values = sorted(values, key= lambda x : x, reverse=True)
+        if values[0] == 5:
+            counted.append((counter, 'Five of a kind', int(bet)))
+        if values[0] == 4:
+            counted.append((counter, 'Four of a kind', int(bet)))
+        if values[0] == 3 and values[1] == 2:
+            counted.append((counter, 'Full house', int(bet)))
+        if values[0] == 3 and values[1] == 1:
+            counted.append((counter, 'Three of a kind', int(bet)))
+        if values[0] == 2 and values[1] == 2:
+            counted.append((counter, 'Two pair', int(bet)))
+        if values[0] == 2 and values[1] == 1:
+            counted.append((counter, 'One pair', int(bet)))
+        if values[0] == 1:
+            counted.append((counter, 'High card', int(bet)))
+    sorted_values = sorted(counted, key=lambda x: order_cards.index(x[0].most_common()[0][0]))
+    sorted_hands = sorted(sorted_values, key=lambda x : order_hand.index(x[1]))
+    return sorted_hands
+
+sorted_counted = sort_and_count(lines)
+        
+def total_winnings(data):
+    total_win = 0
+    for index, tup in enumerate(data):
+        total_win += ((index + 1) * tup[2])
+    return total_win
+
+print('Solution n°7: ', total_winnings(sorted_counted))
+
+# 248113761
+
+        
+    
+
         
         
 
