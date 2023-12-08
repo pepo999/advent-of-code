@@ -340,6 +340,9 @@ def sort_and_count(lines):
     sorted_hands = sorted(sorted_values, key=lambda x : order_hand.index(x[1]))
     return sorted_hands
 
+def sort_recurs(data):
+    pass
+
 sorted_counted = sort_and_count(lines)
         
 def total_winnings(data):
@@ -351,6 +354,56 @@ def total_winnings(data):
 print('Solution n°7: ', total_winnings(sorted_counted))
 
 # 248113761
+
+#####
+# 8 #
+#####
+
+import sys
+
+sys.setrecursionlimit(25000)
+
+lines = []
+with open('data/input_8.txt') as f: 
+    for _ in f:
+        lines.append(_)
+
+def clean_split(lines):
+    instruct = lines[0]
+    tups = []
+    for line in lines[1:]:
+        if line != '' and line != ' ':
+            name = line[:3]
+            l = line[7:10]
+            r = line[12:15]
+            tups.append((name, l, r))
+    return instruct, tups
+        
+instr, tups = clean_split(lines) 
+
+begin = [x for x in tups if x[0] == 'AAA'][0]
+step = 0
+
+def steps_to_zzz(begin, step, index_instr):
+    i = instr[index_instr]
+    if begin[0] == 'ZZZ':
+        return step
+    l = begin[1]
+    r = begin[2]
+    if i == 'L':
+        begin = [x for x in tups if x[0] == l][0]
+    if i == 'R':
+        begin = [x for x in tups if x[0] == r][0]
+    step += 1
+    index_instr += 1
+    if index_instr == len(instr):
+        index_instr = 0
+        step -= 1
+    return steps_to_zzz(begin, step, index_instr) 
+
+print('Solution n°8: ', steps_to_zzz(begin, 0, 0)) 
+            
+        
 
         
     
