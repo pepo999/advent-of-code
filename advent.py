@@ -307,14 +307,6 @@ lines = []
 with open('data/input_7.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-# lines = [
-# '32T3K 765',
-# 'T55J5 684',
-# 'KK677 28',
-# 'KTJJT 220',
-# 'QQQJA 483'
-# ]
 
 order_cards = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
 order_hand = ['Five of a kind', 'Four of a kind', 'Full house', 'Three of a kind', 'Two pair', 'One pair', 'High card']
@@ -323,7 +315,7 @@ def sort_and_count(lines):
     counted = []
     for line in lines:
         hand = line.split(' ')[0]
-        bet = line.split(' ')[1]
+        bet = line.split(' ')[1].replace('\n', '')
         counter = Counter(hand)
         count = counter.values()
         values = []
@@ -372,10 +364,8 @@ def sort_and_count(lines):
             counted.append((counter, 'One pair', int(bet), hand_values))
         if values[0] == 1:
             counted.append((counter, 'High card', int(bet), hand_values))
-    sorted_hands = sorted(counted, key=lambda x: (x[3][0], x[3][1], x[3][2], x[3][3], x[3][4]), reverse=True)
-    sorted_data = sorted(sorted_hands, key=lambda x : order_hand.index(x[1]))
-    # for _ in sorted_data:
-    #     print(_[1], _[3])
+    sorted_hands = sorted(counted, key=lambda x: (x[3][0], x[3][1], x[3][2], x[3][3], x[3][4]))
+    sorted_data = sorted(sorted_hands, key=lambda x : order_hand.index(x[1]), reverse=True)
     return sorted_data
         
 def total_winnings(data):
@@ -390,8 +380,6 @@ def get_total_winnings(lines):
     return tot_win
     
 print('Solution n°7: ', get_total_winnings(lines))
-
-# 248113761
 
 #####
 # 8 #
@@ -477,7 +465,7 @@ def get_diff(line_values, list_diffs = []):
         list_diffs.append(diffs)
         return get_diff(diffs, list_diffs)
 
-def get_next_val(values):  
+def get_next_vals(values):  
     next_values = []
     for line_values in values:
         next_val = line_values[-1]
@@ -487,7 +475,7 @@ def get_next_val(values):
         next_values.append(next_val + result_sum)
     return next_values
 
-print('Solution n°9: ', sum(get_next_val(values)))
+print('Solution n°9: ', sum(get_next_vals(values)))
             
             
         
