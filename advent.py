@@ -6,7 +6,7 @@ lines = []
 with open('data/input_1.txt') as f: 
     for _ in f:
         lines.append(_)
-        
+            
 def get_first_get_last(lines):
     nums = []
     for line in lines:
@@ -247,7 +247,7 @@ def seed_to_loc(seed):
         for step in steps:
             seed = through_steps(seed, step)
         return seed
-    
+
 def min_loc(seeds):
     locs = []
     for seed in seeds:
@@ -281,7 +281,7 @@ for line in lines:
         nums = [x for x in nums if x != ' ' and x != '']
         for num in nums:
             distances.append(int(num))
-            
+         
 def winning_count_mult(times, distances):
     winning_count = 1
     for time, distance in zip(times, distances):
@@ -307,6 +307,14 @@ lines = []
 with open('data/input_7.txt') as f: 
     for _ in f:
         lines.append(_)
+        
+# lines = [
+# '32T3K 765',
+# 'T55J5 684',
+# 'KK677 28',
+# 'KTJJT 220',
+# 'QQQJA 483'
+# ]
 
 order_cards = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
 order_hand = ['Five of a kind', 'Four of a kind', 'Full house', 'Three of a kind', 'Two pair', 'One pair', 'High card']
@@ -322,28 +330,53 @@ def sort_and_count(lines):
         for value in count:
             values.append(value)
         values = sorted(values, key= lambda x : x, reverse=True)
+        hand_values = []
+        for v in hand:
+            if v == '2':
+                hand_values.append(1)
+            if v == '3':
+                hand_values.append(2)
+            if v == '4':
+                hand_values.append(3)
+            if v == '5':
+                hand_values.append(4)
+            if v == '6':
+                hand_values.append(5)
+            if v == '7':
+                hand_values.append(6)
+            if v == '8':
+                hand_values.append(7)
+            if v == '9':
+                hand_values.append(8)
+            if v == 'T':
+                hand_values.append(9)
+            if v == 'J':
+                hand_values.append(10)
+            if v == 'Q':
+                hand_values.append(11)
+            if v == 'K':
+                hand_values.append(12)
+            if v == 'A':
+                hand_values.append(13)
         if values[0] == 5:
-            counted.append((counter, 'Five of a kind', int(bet)))
+            counted.append((counter, 'Five of a kind', int(bet), hand_values))
         if values[0] == 4:
-            counted.append((counter, 'Four of a kind', int(bet)))
+            counted.append((counter, 'Four of a kind', int(bet), hand_values))
         if values[0] == 3 and values[1] == 2:
-            counted.append((counter, 'Full house', int(bet)))
+            counted.append((counter, 'Full house', int(bet), hand_values))
         if values[0] == 3 and values[1] == 1:
-            counted.append((counter, 'Three of a kind', int(bet)))
+            counted.append((counter, 'Three of a kind', int(bet), hand_values))
         if values[0] == 2 and values[1] == 2:
-            counted.append((counter, 'Two pair', int(bet)))
+            counted.append((counter, 'Two pair', int(bet), hand_values))
         if values[0] == 2 and values[1] == 1:
-            counted.append((counter, 'One pair', int(bet)))
+            counted.append((counter, 'One pair', int(bet), hand_values))
         if values[0] == 1:
-            counted.append((counter, 'High card', int(bet)))
-    sorted_values = sorted(counted, key=lambda x: order_cards.index(x[0].most_common()[0][0]))
-    sorted_hands = sorted(sorted_values, key=lambda x : order_hand.index(x[1]))
-    return sorted_hands
-
-def sort_recurs(data):
-    pass
-
-sorted_counted = sort_and_count(lines)
+            counted.append((counter, 'High card', int(bet), hand_values))
+    sorted_hands = sorted(counted, key=lambda x: (x[3][0], x[3][1], x[3][2], x[3][3], x[3][4]), reverse=True)
+    sorted_data = sorted(sorted_hands, key=lambda x : order_hand.index(x[1]))
+    # for _ in sorted_data:
+    #     print(_[1], _[3])
+    return sorted_data
         
 def total_winnings(data):
     total_win = 0
@@ -351,7 +384,12 @@ def total_winnings(data):
         total_win += ((index + 1) * tup[2])
     return total_win
 
-print('Solution n°7: ', total_winnings(sorted_counted))
+def get_total_winnings(lines):
+    sorted_counted = sort_and_count(lines)
+    tot_win = total_winnings(sorted_counted)
+    return tot_win
+    
+print('Solution n°7: ', get_total_winnings(lines))
 
 # 248113761
 
@@ -402,6 +440,64 @@ def steps_to_zzz(begin, step, index_instr):
     return steps_to_zzz(begin, step, index_instr) 
 
 print('Solution n°8: ', steps_to_zzz(begin, 0, 0)) 
+
+#####
+# 9 #
+#####
+
+lines = []
+with open('data/input_9.txt') as f: 
+    for _ in f:
+        lines.append(_)
+
+def clean(lines):
+    line_values = []
+    for line in lines:
+        values = []
+        splitted = line.split(' ')
+        for split in splitted:
+            values.append(int(split))
+        line_values.append(values)
+    return line_values
+
+values = clean(lines)
+
+def get_diff(line_values, list_diffs = []):
+    diffs = []
+    for index, value in enumerate(line_values):
+        if index + 1 == len(line_values):
+            break
+        else:
+            diff = value - line_values[index + 1]
+            diffs.append(diff * -1)
+    if all(value == 0 for value in diffs): 
+        list_diffs.append(diffs)
+        return list_diffs
+    else:
+        list_diffs.append(diffs)
+        return get_diff(diffs, list_diffs)
+
+def get_next_val(values):  
+    next_values = []
+    for line_values in values:
+        next_val = line_values[-1]
+        diffs = get_diff(line_values, [])
+        diffs = list(reversed(diffs))
+        result_sum = sum(sublist[-1] for sublist in diffs)
+        next_values.append(next_val + result_sum)
+    return next_values
+
+print('Solution n°9: ', sum(get_next_val(values)))
+            
+            
+        
+    
+
+
+        
+    
+    
+        
             
         
 
