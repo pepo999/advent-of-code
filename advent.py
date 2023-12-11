@@ -476,6 +476,76 @@ def get_next_vals(values):
     return next_values
 
 print('Solution n°9: ', sum(get_next_vals(values)))
+
+######
+# 10 #
+######
+
+lines = []
+with open('data/input_10.txt') as f: 
+    for _ in f:
+        lines.append(_)
+        
+lines = [
+        '..F7.',
+        '.FJ|.',
+        'SJ.L7',
+        '|F--J',
+        'LJ...'
+        ]
+
+x_axis = len(lines[0])
+y_axis = len(lines)
+
+start = 'S'
+start_coord = tuple()
+for index_y, line in enumerate(lines):
+    for index_x, letter in enumerate(line):
+        if letter == start:
+            start_coord = (index_x, index_y)
+            
+print(start_coord)
+
+directions = [(0, -1, 'up'), (0, +1, 'down'), (-1, 0, 'left'), (+1, 0, 'right')]
+
+def check_move(x, y, last_direction='down', steps=[]):
+    for direction in directions:
+        move = (x + direction[0], y + direction[1])
+        if (move[0] >= 0 and move[0] <= x_axis) and (move[1] >= 0 and move[1] <= y_axis):
+            prev_step = lines[y][x]
+            next_step = lines[move[1]][move[0]]
+            if next_step == 'S' and len(steps) > 10:
+                print('S steps ', steps)
+                return steps
+            next_step_coords = (move[0], move[1])
+            if ((last_direction == 'up' and direction[2] == 'up') or (last_direction == 'down' and direction[2] == 'down')) and next_step == '|':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+            if ((last_direction == 'left' and direction[2] == 'left') or (last_direction == 'right' and direction[2] == 'right')) and next_step == '-':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+            if ((last_direction == 'down' and direction[2] == 'right') or (last_direction == 'left' and direction[2] == 'up')) and next_step == 'L':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+            if ((last_direction == 'down' and direction[2] == 'left') or (last_direction == 'right' and direction[2] == 'up')) and next_step == 'J':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+            if ((last_direction == 'right' and direction[2] == 'down') or (last_direction == 'up' and direction[2] == 'left')) and next_step == '7':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+            if ((last_direction == 'left' and direction[2] == 'down') or (last_direction == 'up' and direction[2] == 'right')) and next_step == 'F':
+                steps.append((prev_step, next_step_coords))
+                print(next_step, direction[2], move[0], move[1])
+                return check_move(move[0], move[1], direction[2], steps)
+      
+check_move(start_coord[0], start_coord[1])
+
+# 6714
             
             
         
