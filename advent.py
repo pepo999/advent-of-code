@@ -485,17 +485,6 @@ lines = []
 with open('data/input_10.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-lines = [
-        '..F7.',
-        '.FJ|.',
-        'SJ.L7',
-        '|F--J',
-        'LJ...'
-        ]
-
-x_axis = len(lines[0])
-y_axis = len(lines)
 
 start = 'S'
 start_coord = tuple()
@@ -504,46 +493,37 @@ for index_y, line in enumerate(lines):
         if letter == start:
             start_coord = (index_x, index_y)
 
-directions = [(0, -1, 'up'), (0, +1, 'down'), (-1, 0, 'left'), (+1, 0, 'right')]
+directions = ['up', 'down', 'left', 'right']
 
-def check_move(x, y, last_direction='down', steps=[]):
+def move(x, y, steps = []):
+    char = lines[y][x]
+    connections = []
+    steps.append((x, y))
     for direction in directions:
-        move = (x + direction[0], y + direction[1])
-        if (move[0] >= 0 and move[0] <= x_axis) and (move[1] >= 0 and move[1] <= y_axis):
-            prev_step = lines[y][x]
-            next_step = lines[move[1]][move[0]]
-            if next_step == 'S' and len(steps) > 10:
-                print('S steps ', steps)
-                return steps
-            next_step_coords = (move[0], move[1])
-            if ((last_direction == 'up' and direction[2] == 'up') or (last_direction == 'down' and direction[2] == 'down')) and next_step == '|':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-            if ((last_direction == 'left' and direction[2] == 'left') or (last_direction == 'right' and direction[2] == 'right')) and next_step == '-':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-            if ((last_direction == 'down' and direction[2] == 'right') or (last_direction == 'left' and direction[2] == 'up')) and next_step == 'L':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-            if ((last_direction == 'down' and direction[2] == 'left') or (last_direction == 'right' and direction[2] == 'up')) and next_step == 'J':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-            if ((last_direction == 'right' and direction[2] == 'down') or (last_direction == 'up' and direction[2] == 'left')) and next_step == '7':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-            if ((last_direction == 'left' and direction[2] == 'down') or (last_direction == 'up' and direction[2] == 'right')) and next_step == 'F':
-                steps.append((prev_step, next_step_coords))
-                print(next_step, direction[2], move[0], move[1])
-                return check_move(move[0], move[1], direction[2], steps)
-      
-# check_move(start_coord[0], start_coord[1])
-
-# 6714
+        up, down, left, right = '.', '.', '.', '.'
+        if y - 1 >= 0:
+            up = lines[y - 1][x]
+        if y + 1 < len(lines):
+            down = lines[y + 1][x]
+        if x + 1 < len(lines[0]):
+            right = lines[y][x + 1]
+        if x - 1 >= 0:
+            left = lines[y][x - 1]
+        if direction == 'up' and (up == '|' or up == '7' or up == 'F' or up == 'S') and (char == '|' or char == 'L' or char == 'J' or char =='S'):
+            connections.append((x, y -1, up))
+        if direction == 'down' and (down == '|' or down == 'L' or down == 'J' or down == 'S') and (char == '|' or char == '7' or char == 'F' or char =='S'):
+            connections.append((x, y + 1, down))
+        if direction == 'left' and (left == '-' or left == 'F' or left == 'L' or left == 'S') and (char == '-' or char == 'J' or char == '7' or char =='S'):
+            connections.append((x - 1, y, left))
+        if direction == 'right' and (right == '-' or right == '7' or right == 'J' or right == 'S') and (char == '-' or char == 'L' or char =='F' or char =='S'):
+            connections.append((x + 1, y, right))
+    if len(connections) == 2:
+        for connection in connections:
+            if (connection[0], connection[1]) not in steps: 
+                return move(connection[0], connection[1], steps)
+    return len(steps) // 2
+             
+print('Solution n°10: ', move(start_coord[0], start_coord[1]))
 
 ######
 # 11 #
