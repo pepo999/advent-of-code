@@ -503,8 +503,6 @@ for index_y, line in enumerate(lines):
     for index_x, letter in enumerate(line):
         if letter == start:
             start_coord = (index_x, index_y)
-            
-print(start_coord)
 
 directions = [(0, -1, 'up'), (0, +1, 'down'), (-1, 0, 'left'), (+1, 0, 'right')]
 
@@ -543,9 +541,106 @@ def check_move(x, y, last_direction='down', steps=[]):
                 print(next_step, direction[2], move[0], move[1])
                 return check_move(move[0], move[1], direction[2], steps)
       
-check_move(start_coord[0], start_coord[1])
+# check_move(start_coord[0], start_coord[1])
 
 # 6714
+
+######
+# 11 #
+######
+
+lines = []
+with open('data/input_11.txt') as f: 
+    for _ in f:
+        lines.append(_)
+        
+# lines = [
+#         '...#......',
+#         '.......#..',
+#         '#.........',
+#         '..........',
+#         '......#...',
+#         '.#........',
+#         '.........#',
+#         '..........',
+#         '.......#..',
+#         '#...#.....'
+#         ]
+
+def expanded(lines):
+    expanded = []
+    for line in lines:
+        if any(x == '#' for x in line): 
+            expanded.append(line)
+        else:
+            expanded.append(line)
+            expanded.append(line)             
+    return expanded
+
+expanded_x = expanded(lines)
+inverted_map = [''.join(row[i] for row in expanded_x) for i in range(len(expanded_x[0]))]
+expanded_y = expanded(inverted_map)
+expanded_map = [''.join(row[i] for row in expanded_y) for i in range(len(expanded_y[0]))]
+
+def sub_nums(map):
+    sub_map = []
+    num = 1
+    nums = []
+    for line in map:
+        new_line = ''
+        for x in line:
+            if x == '#':
+                new_line += str(num)
+                nums.append(num)
+                num += 1  
+            if x == '.':
+                new_line += '.'
+        sub_map.append(new_line)
+    return sub_map, nums
+
+sub_map, nums = sub_nums(expanded_map)
+
+def pair_nums(nums):
+    pairs = []
+    for num in nums:
+        num = str(num)
+        for i in range(len(nums)):
+            i += 1
+            i = str(i)
+            if i != num and ((i, num) not in pairs) and ((num, i) not in pairs):
+                pairs.append((num, i))
+    return pairs
+            
+pairs = pair_nums(nums)
+
+def find_coordinates(map, num):
+    for i, line in enumerate(map):
+        for j, char in enumerate(line):
+            if char == num:
+                return i, j
+            
+def shortest_path_between_pairs(map, pair):
+    start, end = pair
+    start_coords = find_coordinates(map, start)
+    end_coords = find_coordinates(map, end)
+    start_y, start_x = start_coords
+    end_y, end_x = end_coords
+    distance = abs(start_x - end_x) + abs(start_y - end_y)
+    return distance
+
+paths_len = []    
+for pair in pairs:
+    distance = shortest_path_between_pairs(sub_map, pair)
+    paths_len.append(distance)
+    print(pair, distance)
+    
+print('Solution n°11: ', sum(paths_len))
+
+                
+
+
+    
+
             
             
         
