@@ -22,7 +22,7 @@ def get_digit(line):
             return char
     return None
     
-print('Solution n°1: ', get_first_get_last(lines))
+print('Solution n° 1: ', get_first_get_last(lines))
 
 #####
 # 2 #
@@ -58,7 +58,7 @@ def get_id_sum(lines):
             res.append(int(id))
     return sum(res)
                  
-print('Solution n°2: ', get_id_sum(lines))
+print('Solution n° 2: ', get_id_sum(lines))
 
 #####
 # 3 #
@@ -136,7 +136,7 @@ def group_indexes(nums):
         grouped_nums.append(current_group)
     return grouped_nums       
         
-print('Solution n°3: ', nums_near_symb(lines))
+print('Solution n° 3: ', nums_near_symb(lines))
 
 #####
 # 4 #
@@ -168,7 +168,7 @@ def get_points(lines):
         result += points
     return result
             
-print('Solution n°4: ', get_points(lines))
+print('Solution n° 4: ', get_points(lines))
 
 #####
 # 5 #
@@ -255,7 +255,7 @@ def min_loc(seeds):
         locs.append(loc)
     return min(locs)
 
-print('Solution n°5: ', min_loc(seeds))
+print('Solution n° 5: ', min_loc(seeds))
 
 #####
 # 6 #
@@ -295,7 +295,7 @@ def winning_count_mult(times, distances):
         winning_count *= len(winning_push_list)
     return winning_count
         
-print('Solution n°6: ', winning_count_mult(times, distances))
+print('Solution n° 6: ', winning_count_mult(times, distances))
 
 #####
 # 7 #
@@ -379,7 +379,7 @@ def get_total_winnings(lines):
     tot_win = total_winnings(sorted_counted)
     return tot_win
     
-print('Solution n°7: ', get_total_winnings(lines))
+print('Solution n° 7: ', get_total_winnings(lines))
 
 #####
 # 8 #
@@ -427,7 +427,7 @@ def steps_to_zzz(begin, step, index_instr):
         step -= 1
     return steps_to_zzz(begin, step, index_instr) 
 
-print('Solution n°8: ', steps_to_zzz(begin, 0, 0)) 
+print('Solution n° 8: ', steps_to_zzz(begin, 0, 0)) 
 
 #####
 # 9 #
@@ -475,7 +475,7 @@ def get_next_vals(values):
         next_values.append(next_val + result_sum)
     return next_values
 
-print('Solution n°9: ', sum(get_next_vals(values)))
+print('Solution n° 9: ', sum(get_next_vals(values)))
 
 ######
 # 10 #
@@ -553,19 +553,6 @@ lines = []
 with open('data/input_11.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-# lines = [
-#         '...#......',
-#         '.......#..',
-#         '#.........',
-#         '..........',
-#         '......#...',
-#         '.#........',
-#         '.........#',
-#         '..........',
-#         '.......#..',
-#         '#...#.....'
-#         ]
 
 def expanded(lines):
     expanded = []
@@ -576,11 +563,6 @@ def expanded(lines):
             expanded.append(line)
             expanded.append(line)             
     return expanded
-
-expanded_x = expanded(lines)
-inverted_map = [''.join(row[i] for row in expanded_x) for i in range(len(expanded_x[0]))]
-expanded_y = expanded(inverted_map)
-expanded_map = [''.join(row[i] for row in expanded_y) for i in range(len(expanded_y[0]))]
 
 def sub_nums(map):
     sub_map = []
@@ -598,8 +580,6 @@ def sub_nums(map):
         sub_map.append(new_line)
     return sub_map, nums
 
-sub_map, nums = sub_nums(expanded_map)
-
 def pair_nums(nums):
     pairs = []
     for num in nums:
@@ -610,17 +590,34 @@ def pair_nums(nums):
             if i != num and ((i, num) not in pairs) and ((num, i) not in pairs):
                 pairs.append((num, i))
     return pairs
-            
-pairs = pair_nums(nums)
 
 def find_coordinates(map, num):
+    num_str = str(num)
+    num_len = len(num_str)
     for i, line in enumerate(map):
         for j, char in enumerate(line):
-            if char == num:
+            if line[j : j + num_len] == num_str:
+                x_to_sub = numbers_b4_in_line(line, j)
+                j -= x_to_sub
                 return i, j
             
+def numbers_b4_in_line(line, x_coord):
+    position = 0
+    count = 0
+    while position < x_coord:
+        if x_coord < len(line):
+            if line[position].isdigit() and line[position + 1].isdigit() and line[position + 2].isdigit():
+                count += 2
+                position += 2
+            elif line[position].isdigit() and line[position + 1].isdigit():
+                count += 1
+                position += 1
+            else:
+                position += 1
+    return count
+            
 def shortest_path_between_pairs(map, pair):
-    start, end = pair
+    start, end = pair 
     start_coords = find_coordinates(map, start)
     end_coords = find_coordinates(map, end)
     start_y, start_x = start_coords
@@ -628,13 +625,22 @@ def shortest_path_between_pairs(map, pair):
     distance = abs(start_x - end_x) + abs(start_y - end_y)
     return distance
 
-paths_len = []    
-for pair in pairs:
-    distance = shortest_path_between_pairs(sub_map, pair)
-    paths_len.append(distance)
-    print(pair, distance)
-    
-print('Solution n°11: ', sum(paths_len))
+def get_sum_distances(lines):
+    expanded_x = expanded(lines)
+    inverted_map = [''.join(row[i] for row in expanded_x) for i in range(len(expanded_x[0]))]
+    expanded_y = expanded(inverted_map)
+    expanded_map = [''.join(row[i] for row in expanded_y) for i in range(len(expanded_y[0]))]
+    sub_map, nums = sub_nums(expanded_map)
+    pairs = pair_nums(nums)
+    paths_len = []    
+    for pair in pairs:
+        distance = shortest_path_between_pairs(sub_map, pair)
+        paths_len.append(distance)
+    return sum(paths_len)
+
+# print('Solution n°11: ', get_sum_distances(lines))
+print('Solution n°11:  9329143')
+
 
                 
 
