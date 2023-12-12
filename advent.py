@@ -510,7 +510,7 @@ def move(x, y, steps = []):
         if x - 1 >= 0:
             left = lines[y][x - 1]
         if direction == 'up' and (up == '|' or up == '7' or up == 'F' or up == 'S') and (char == '|' or char == 'L' or char == 'J' or char =='S'):
-            connections.append((x, y -1, up))
+            connections.append((x, y - 1, up))
         if direction == 'down' and (down == '|' or down == 'L' or down == 'J' or down == 'S') and (char == '|' or char == '7' or char == 'F' or char =='S'):
             connections.append((x, y + 1, down))
         if direction == 'left' and (left == '-' or left == 'F' or left == 'L' or left == 'S') and (char == '-' or char == 'J' or char == '7' or char =='S'):
@@ -523,7 +523,8 @@ def move(x, y, steps = []):
                 return move(connection[0], connection[1], steps)
     return len(steps) // 2
              
-print('Solution n°10: ', move(start_coord[0], start_coord[1]))
+# print('Solution n°10: ', move(start_coord[0], start_coord[1]))
+print('Solution n°10:  6714')
 
 ######
 # 11 #
@@ -620,6 +621,99 @@ def get_sum_distances(lines):
 
 # print('Solution n°11: ', get_sum_distances(lines))
 print('Solution n°11:  9329143')
+
+######
+# 12 #
+######
+
+from itertools import product
+
+lines = []
+with open('data/input_12.txt') as f: 
+    for _ in f:
+        lines.append(_)
+        
+# lines = [
+#         '???.### 1,1,3',
+#         '.??..??...?##. 1,1,3',
+#         '?#?#?#?#?#?#?#? 1,3,1,6',
+#         '????.#...#... 4,1,1',
+#         '????.######..#####. 1,6,5',
+#         '?###???????? 3,2,1'
+#         ]
+
+def clean(lines):
+    puzzs = []
+    instructions = []
+    for line in lines:
+        line_instr = []
+        chars = line.split(' ')[0]
+        instr = line.split(' ')[1]
+        puzzs.append('.' + chars + '.')
+        blocks = instr.split(',')
+        for block in blocks:
+            transf = '.' + ('#' * int(block)) + '.'
+            line_instr.append(transf)
+        # line_instr.sort(key= lambda x : x)
+        instructions.append(line_instr)
+    return puzzs, instructions
+
+def possible_lines(input_string):
+    possible_values = ['.', '#']
+    combinations = product(possible_values, repeat=input_string.count('?'))
+    result_strings = []
+    for combination in combinations:
+        result = ''
+        for char in input_string:
+            if char == '?':
+                result += combination[0]
+                combination = combination[1:] + combination[:1]
+            else:
+                result += char
+        result_strings.append(result)
+    return result_strings
+
+def check_order(input_string, blocks_list):
+    in_str = []
+    nu_block = ''
+    for i, char in enumerate(input_string):
+        if char == '#':
+            nu_block += char
+        elif nu_block:
+            in_str.append(nu_block)
+            nu_block = ''
+    if nu_block:
+        in_str.append(nu_block)
+    blocks_list = [block[1:-1] for block in blocks_list]
+    return in_str == blocks_list
+
+    
+def perms(lines):
+    puzzs, instructions = clean(lines)
+    counts = []
+    for puzz, instr in zip(puzzs, instructions):
+        possible_combs = possible_lines(puzz)
+        count = 0
+        for poss in possible_combs:
+            og_poss = poss
+            poss_count = 0
+            for inst in instr:
+                if inst in poss:
+                    poss_count += 1 
+                    index = poss.find(inst)
+                    poss = poss[:index + 1] + poss[index + len(inst):]              
+            if poss_count == len(instr) and (og_poss.count('#') == ''.join(instr).count('#')):
+                ordered = check_order(og_poss, instr)  
+                if ordered:
+                    count += 1
+        counts.append(count)
+    return counts
+        
+# print('Solution n°12: ', sum(perms(lines)))
+print('Solution n°12:  7251')
+
+           
+        
 
 
                 
