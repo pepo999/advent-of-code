@@ -632,15 +632,6 @@ lines = []
 with open('data/input_12.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-# lines = [
-#         '???.### 1,1,3',
-#         '.??..??...?##. 1,1,3',
-#         '?#?#?#?#?#?#?#? 1,3,1,6',
-#         '????.#...#... 4,1,1',
-#         '????.######..#####. 1,6,5',
-#         '?###???????? 3,2,1'
-#         ]
 
 def clean(lines):
     puzzs = []
@@ -654,7 +645,6 @@ def clean(lines):
         for block in blocks:
             transf = '.' + ('#' * int(block)) + '.'
             line_instr.append(transf)
-        # line_instr.sort(key= lambda x : x)
         instructions.append(line_instr)
     return puzzs, instructions
 
@@ -687,7 +677,6 @@ def check_order(input_string, blocks_list):
     blocks_list = [block[1:-1] for block in blocks_list]
     return in_str == blocks_list
 
-    
 def perms(lines):
     puzzs, instructions = clean(lines)
     counts = []
@@ -712,39 +701,83 @@ def perms(lines):
 # print('Solution n°12: ', sum(perms(lines)))
 print('Solution n°12:  7251')
 
-           
+######
+# 13 #
+######
+
+lines = []
+with open('data/input_13.txt') as f: 
+    for _ in f:
+        lines.append(_)
         
+lines = [
+        '#.##..##.',
+        '..#.##.#.',
+        '##......#',
+        '##......#',
+        '..#.##.#.',
+        '..##..##.',
+        '#.#.##.#.',
+        '',
+        '#...##..#',
+        '#....#..#',
+        '..##..###',
+        '#####.##.',
+        '#####.##.',
+        '..##..###',
+        '#....#..#'
+        ]
 
+def split_in_blocks(lines):
+    empty_line_indices = [i for i, line in enumerate(lines) if not line.strip()]
+    blocks = [lines[i:j] for i, j in zip([0] + empty_line_indices, empty_line_indices + [None]) if i != j]
+    cleaned = [[line.replace('\n', '') for line in block if line.strip()] for block in blocks]
+    return cleaned
+        
+blocks = split_in_blocks(lines)
+print(blocks)
 
-                
-
-
-    
-
+def find_symm(block, axis):
+    if axis == 'x':
+        transposed_block = list(zip(*block))
+        block = [''.join(row[::-1]) for row in transposed_block]
+    len_b = len(block)
+    ress = []
+    for i in range(0, len_b):
+        lines_before = []
+        lines_after = []
+        for j in range(i, 0, -1):
+            lines_before.append(block[j])
+        for k in range(i, len_b):
+            lines_after.append(block[k -1])
+        equal_lines = []
+        for before, after in zip(lines_before, lines_after):
+            if before == after:
+                equal_lines.append(before)
+        res = 0
+        if equal_lines != []:
+            if axis == 'x':
+                res = i
+                ress.append(res)
+            if axis == 'y':
+                res = (i + 1) * 100
+                ress.append(res)
+    if ress != []:
+        return sum(ress)
             
-            
-        
-    
-
-
-        
-    
-    
-        
-            
-        
-
-        
-    
-
-        
-        
-
-
-
-
-    
-
-
-
-            
+def get_result(blocks):
+    res = []
+    for block in blocks:
+        res_x = find_symm(block, 'x')
+        res_x__y = []
+        if res_x:
+            res_x__y.append(res_x) 
+        res_y = find_symm(block, 'y')
+        if res_y:
+            res_x__y.append(res_y)
+        res.append(sum(res_x__y))
+        print(block, res)
+    return sum(res)
+         
+# 40006
+print('Solution n°13: ', get_result(blocks))           
