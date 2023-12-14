@@ -705,28 +705,30 @@ print('Solution n°12:  7251')
 # 13 #
 ######
 
+import time
+
 lines = []
 with open('data/input_13.txt') as f: 
     for _ in f:
         lines.append(_)
         
-lines = [
-        '#.##..##.',
-        '..#.##.#.',
-        '##......#',
-        '##......#',
-        '..#.##.#.',
-        '..##..##.',
-        '#.#.##.#.',
-        '',
-        '#...##..#',
-        '#....#..#',
-        '..##..###',
-        '#####.##.',
-        '#####.##.',
-        '..##..###',
-        '#....#..#'
-        ]
+# lines = [
+#         '#.##..##.',
+#         '..#.##.#.',
+#         '##......#',
+#         '##......#',
+#         '..#.##.#.',
+#         '..##..##.',
+#         '#.#.##.#.',
+#         '',
+#         '#...##..#',
+#         '#....#..#',
+#         '..##..###',
+#         '#####.##.',
+#         '#####.##.',
+#         '..##..###',
+#         '#....#..#'
+#         ]
 
 def split_in_blocks(lines):
     empty_line_indices = [i for i, line in enumerate(lines) if not line.strip()]
@@ -737,49 +739,65 @@ def split_in_blocks(lines):
 blocks = split_in_blocks(lines)
 
 def find_symm(block, axis):
+    ress = []
+    # for l in block:
+    #     print(l)
+    # print('axis', axis)
     if axis == 'x':
         transposed_block = list(zip(*block))
         block = [''.join(row[::-1]) for row in transposed_block]
     len_b = len(block)
-    ress = []
-    for i in range(0, len_b):
+    for i in range(1, len_b):
         lines_before = []
         lines_after = []
         for j in range(i, 0, -1):
-            lines_before.append(block[j])
+            lines_before.append(block[j - 1])
         for k in range(i, len_b):
-            lines_after.append(block[k -1])
+            lines_after.append(block[k])
         equal_lines = []
         for before, after in zip(lines_before, lines_after):
             if before == after:
                 equal_lines.append(before)
-        res = 0
-        if equal_lines != []:
+            if before != after:
+                break
+        if equal_lines != [] and (len(equal_lines) * 2) >= len_b - i:
+            # print(equal_lines, axis, i)
+            # print('next')
+            # print(equal_lines, 'eq lin * 2', len(equal_lines) * 2, 'len blok', len(block), 'index', i, axis)
+            # print('lines b4', lines_before)
+            # print('lines 4ft', lines_after)
             if axis == 'x':
                 res = i
                 ress.append(res)
             if axis == 'y':
-                res = (i + 1) * 100
+                res = i * 100
                 ress.append(res)
     if ress != []:
+        
         return sum(ress)
-            
+
 def get_result(blocks):
     res = []
     for block in blocks:
         res_x = find_symm(block, 'x')
+        # print(' ')
+        # print('res x ', res_x)
         res_x__y = []
         if res_x:
             res_x__y.append(res_x) 
         res_y = find_symm(block, 'y')
+        # print(' ')
+        # print('res y ', res_y)
         if res_y:
             res_x__y.append(res_y)
         res.append(sum(res_x__y))
-        # print(block, res)
+        # print('tot res', sum(res_x__y))
+        # print(' ')
+        # time.sleep(30)
     return sum(res)
-         
+    
 # 40006
-print('Solution n°13: ', get_result(blocks)) 
+print('Solution n°13: ', get_result(blocks[1:])) 
 
 ######
 # 14 #
