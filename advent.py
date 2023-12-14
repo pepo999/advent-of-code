@@ -735,7 +735,6 @@ def split_in_blocks(lines):
     return cleaned
         
 blocks = split_in_blocks(lines)
-print(blocks)
 
 def find_symm(block, axis):
     if axis == 'x':
@@ -776,8 +775,74 @@ def get_result(blocks):
         if res_y:
             res_x__y.append(res_y)
         res.append(sum(res_x__y))
-        print(block, res)
+        # print(block, res)
     return sum(res)
          
 # 40006
-print('Solution n°13: ', get_result(blocks))           
+print('Solution n°13: ', get_result(blocks)) 
+
+######
+# 14 #
+######
+
+lines = []
+with open('data/input_14.txt') as f: 
+    for _ in f:
+        lines.append(_) 
+
+def create_line(info):
+    line = ['.'] * info['len_line']
+    for hash_index in info['hash']:
+        line[hash_index] = '#'
+    for dot_block in info['dots']:
+        for dot_index in dot_block:
+            line[dot_index] = 'O'
+    return ''.join(line) 
+    
+def move_circs(lines):
+    turned_mat = list(zip(*lines))
+    turned_mat = [''.join(row[::-1]) for row in turned_mat]
+    moved = []
+    for index, line in enumerate(turned_mat):
+        indexes = {"line_index": index, "len_line": len(line), "dots": [], "hash": []}
+        for k, char in enumerate(line):
+            if char == 'O':
+                indexes['dots'].append(k)
+            if char == '#':
+                indexes['hash'].append(k)
+        indexes['hash'].append(len(line))
+        splitted_dots = []
+        prev_hash = -1
+        for h in indexes['hash']:
+            dot_block = [o for o in indexes['dots'] if prev_hash < o < h]
+            splitted_dots.append(dot_block)
+            prev_hash = h
+        dot_block = [o for o in indexes['dots'] if o > prev_hash]
+        splitted_dots.append(dot_block)
+        splitted_dots = [dot_block for dot_block in splitted_dots[:-1]]
+        moved_dots = []
+        for dot_block, hash_idx in zip(splitted_dots, indexes['hash']):
+            moved_dots.append([i for i in range(hash_idx -1, hash_idx - len(dot_block) - 1, -1)])
+        moved_dots = [x for x in moved_dots if x != []]    
+        indexes['dots'] = moved_dots
+        indexes['hash'] = indexes['hash'][:-1]
+        nu_line = create_line(indexes)
+        moved.append(nu_line)
+    turned_back = list(zip(*moved))
+    turned_back = [''.join(row) for row in reversed(turned_back)]
+    return turned_back
+    
+def count_points(lines):
+    points = 0
+    for index, line in enumerate(lines[::-1]):
+        dot_count = 0
+        for char in line:
+            if char == 'O':
+                dot_count += 1
+        points += dot_count * (index + 1)
+    return points
+    
+moved = move_circs(lines)
+
+print('Solution n°14: ', count_points(moved))
+
