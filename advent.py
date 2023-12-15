@@ -864,3 +864,35 @@ moved = move_circs(lines)
 
 print('Solution n°14: ', count_points(moved))
 
+######
+# 15 #
+######
+
+lines = ''
+with open('data/input_15.txt') as f: 
+    for _ in f:
+        lines += _
+    
+lines = lines.split(',')
+
+def get_value(char, current_val):
+    current_val += ord(char)
+    current_val *= 17
+    current_val = current_val % 256
+    return current_val
+
+def get_block_hash(block):
+    res = 0
+    for char in block:
+        res = get_value(char, res)
+    return res
+
+def get_values(lines):
+    res = 0
+    for block in lines:
+        block = block.replace('\n', '')
+        hash = get_block_hash(block)
+        res += hash
+    return res
+
+print('Solution n°15: ', get_values(lines))
