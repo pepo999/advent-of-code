@@ -859,3 +859,114 @@ def get_values(lines):
     return res
 
 print('Solution n°15: ', get_values(lines))
+
+######
+# 16 #
+######
+
+lines = []
+with open('data/input_16.txt') as f: 
+    for _ in f:
+        lines.append(_) 
+        
+lines = [
+        '.|...\....',
+        '|.-.\.....',
+        '.....|-...',
+        '........|.',
+        '..........',
+        '.........\\',
+        '..../.\\\\..',
+        '.-.-/..|..',
+        '.|....-|.\\',
+        '..//.|....',
+        ]
+
+import time
+import os
+
+for line in lines:
+    print(line)
+
+def print_steps(steps, lines):
+    len_x = len(lines[0])
+    len_y = len(lines)
+    final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
+    for step in steps:
+        x, y = step[0]
+        final_grid[y][x] = '#'
+    for row, line in zip(final_grid, lines):
+        print(''.join(row), '    ', line)
+    time.sleep(0.3)
+    os.system('clear' if os.name == 'posix' else 'cls')
+    
+directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
+        
+def move_beam(position=(0, 0), direction=(1, 0, 'r'), steps=[]):
+    steps.append((position, direction[2]))
+    print_steps(steps, lines)
+    if position[0] + direction[0] >= len(lines[0]) or position[0] + direction[0] < 0:
+        return steps
+    if position[1] + direction[1] >= len(lines) or position[1] + direction[1] < 0:
+        return steps
+    position = (position[0] + direction[0], position[1] + direction[1])
+    if (position, direction[2]) in steps:
+        return steps
+    next_pos = lines[position[1]][position[0]]
+    # print(next_pos)
+    if next_pos == '.':
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '-' and (direction[2] == 'r' or direction[2] == 'l'):
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '-' and (direction[2] == 'u' or direction[2] =='d'):
+        a = move_beam(position, directions[0], steps.copy())
+        b = move_beam(position, directions[2], steps.copy())
+        steps += a + b
+    elif next_pos == '|' and (direction[2] == 'u' or direction[2] == 'd'):
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '|' and (direction[2] == 'l' or direction[2] == 'r'):
+        a = move_beam(position, directions[3], steps.copy())
+        b = move_beam(position, directions[1], steps.copy())
+        steps += a + b
+    elif next_pos == '\\' and direction[2] == 'r':
+        steps += move_beam(position, directions[1], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'l':
+        steps += move_beam(position, directions[3], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'u':
+        steps += move_beam(position, directions[2], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'd':
+        steps += move_beam(position, directions[0], steps.copy())
+    elif next_pos == '/' and direction[2] == 'r':
+        steps += move_beam(position, directions[3], steps.copy())
+    elif next_pos == '/' and direction[2] == 'l':
+        steps += move_beam(position, directions[1], steps.copy())
+    elif next_pos == '/' and direction[2] == 'u':
+        steps += move_beam(position, directions[0], steps.copy())
+    elif next_pos == '/' and direction[2] == 'd':
+        steps += move_beam(position, directions[2], steps.copy())
+    return steps
+
+count = 0
+stepz = move_beam()
+len_x = len(lines[0])
+len_y = len(lines)
+final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
+for step in stepz:
+    x, y = step[0]
+    final_grid[y][x] = '#'
+for row in final_grid:
+    for char in row:
+        if char == '#':
+            count +=1
+
+print('Solution n°16: ', count)
+    
+# 7482
+
+        
+        
+            
+    
