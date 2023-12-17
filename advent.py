@@ -864,29 +864,13 @@ print('Solution n°15: ', get_values(lines))
 # 16 #
 ######
 
-lines = []
-with open('data/input_16.txt') as f: 
-    for _ in f:
-        lines.append(_) 
-        
-lines = [
-        '.|...\....',
-        '|.-.\.....',
-        '.....|-...',
-        '........|.',
-        '..........',
-        '.........\\',
-        '..../.\\\\..',
-        '.-.-/..|..',
-        '.|....-|.\\',
-        '..//.|....',
-        ]
-
 import time
 import os
 
-for line in lines:
-    print(line)
+lines = []
+with open('data/input_16.txt') as f: 
+    for _ in f:
+        lines.append(_.replace('\n', '')) 
 
 def print_steps(steps, lines):
     len_x = len(lines[0])
@@ -896,15 +880,16 @@ def print_steps(steps, lines):
         x, y = step[0]
         final_grid[y][x] = '#'
     for row, line in zip(final_grid, lines):
-        print(''.join(row), '    ', line)
+        # print(''.join(row), '    ', line)
+        print(''.join(row))
     time.sleep(0.3)
     os.system('clear' if os.name == 'posix' else 'cls')
     
 directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
         
-def move_beam(position=(0, 0), direction=(1, 0, 'r'), steps=[]):
+def move_beam(position=(-1, 0), direction=(1, 0, 'r'), steps=[]):
     steps.append((position, direction[2]))
-    print_steps(steps, lines)
+    # print_steps(steps, lines)
     if position[0] + direction[0] >= len(lines[0]) or position[0] + direction[0] < 0:
         return steps
     if position[1] + direction[1] >= len(lines) or position[1] + direction[1] < 0:
@@ -913,7 +898,6 @@ def move_beam(position=(0, 0), direction=(1, 0, 'r'), steps=[]):
     if (position, direction[2]) in steps:
         return steps
     next_pos = lines[position[1]][position[0]]
-    # print(next_pos)
     if next_pos == '.':
         same_dir = [x for x in directions if x[2] == direction[2]][0]
         steps += move_beam(position, same_dir, steps.copy())
@@ -949,22 +933,99 @@ def move_beam(position=(0, 0), direction=(1, 0, 'r'), steps=[]):
         steps += move_beam(position, directions[2], steps.copy())
     return steps
 
-count = 0
-stepz = move_beam()
-len_x = len(lines[0])
-len_y = len(lines)
-final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
-for step in stepz:
-    x, y = step[0]
-    final_grid[y][x] = '#'
-for row in final_grid:
-    for char in row:
-        if char == '#':
-            count +=1
+def count_energized(lines):
+    count = 0
+    steps = move_beam()
+    len_x = len(lines[0])
+    len_y = len(lines)
+    final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
+    for step in steps:
+        x, y = step[0]
+        final_grid[y][x] = '#'
+    for row in final_grid:
+        for char in row:
+            if char == '#':
+                count +=1
+    return count
 
-print('Solution n°16: ', count)
-    
-# 7482
+# print('Solution n°16: ', count_energized(lines))
+print('Solution n°16:  7482')
+
+######
+# 17 #
+######
+
+lines = []
+with open('data/input_17.txt') as f: 
+    for _ in f:
+        lines.append(_.replace('\n', '')) 
+        
+lines = [
+        '2413432311323',
+        '3215453535623',
+        '3255245654254',
+        '3446585845452',
+        '4546657867536',
+        '1438598798454',
+        '4457876987766',
+        '3637877979653',
+        '4654967986887',
+        '4564679986453',
+        '1224686865563',
+        '2546548887735',
+        '4322674655533'
+        ]
+        
+ints = [[[(x, y), int(weight), float('inf'), None] for x, weight in enumerate(line)] for y, line in enumerate(lines)]
+ints[0][0][2] = 0
+
+directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
+
+def shortest_paths(ints):
+    start_coords, weight_start, shortest_start, previous_start = ints[0][0]
+    end_coords, weight_end, shortest_end, previous_end = ints[-1][-1]
+    hist = []
+    for y in ints:
+        for x in y:
+            current_coords, current_weight, current_shortest, current_prev = x
+            for dir in directions:
+                next_coords = (current_coords[0] + dir[0], current_coords[1] + dir[1])
+                if 0 <= next_coords[0] < len(ints[0]) and 0 <= next_coords[1] < len(ints):
+                    next_cell = ints[next_coords[1]][next_coords[0]]
+                    new_shortest = current_shortest + next_cell[1]
+                    
+                    # here insert conditions:
+                    # # no more than three steps in the same direction
+                    # # never going back
+                    if new_shortest < next_cell[2]:
+                        hist.append(dir[2])
+                        next_cell[2] = new_shortest
+                        next_cell[3] = current_coords
+    print('hist', hist)
+    return ints
+
+ints = shortest_paths(ints)
+
+def get_path(end_cell, path=None):
+    if path is None:
+        path = [end_cell]
+    if end_cell[3] == (0, 0):
+        path.append(end_cell[0])
+        return path
+    previous_cell_coords = end_cell[3]
+    previous_cell = ints[previous_cell_coords[1]][previous_cell_coords[0]]
+    path.append(previous_cell)
+    return get_path(previous_cell, path)
+
+shortest_path = get_path(ints[-1][-1])
+# print(shortest_path)
+count = 0
+for x in shortest_path:
+    print(x[0])
+    count += x[1]
+# 902
+
+print('Solution n°17: ', count)
 
         
         
