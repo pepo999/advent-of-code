@@ -1001,7 +1001,7 @@ def shortest_paths(ints):
                         hist.append(dir[2])
                         next_cell[2] = new_shortest
                         next_cell[3] = current_coords
-    print('hist', hist)
+    print('hist', hist, 'len', len(hist))
     return ints
 
 ints = shortest_paths(ints)
@@ -1021,8 +1021,9 @@ shortest_path = get_path(ints[-1][-1])
 # print(shortest_path)
 count = 0
 for x in shortest_path:
-    print(x[0])
+    # print(x[0])
     count += x[1]
+count += ints[-1][-1][1]
 # 902
 
 print('Solution n°17: ', count)
