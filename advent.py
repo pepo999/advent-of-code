@@ -882,7 +882,7 @@ def print_steps(steps, lines):
     for row, line in zip(final_grid, lines):
         # print(''.join(row), '    ', line)
         print(''.join(row))
-    time.sleep(0.3)
+    time.sleep(0.1)
     os.system('clear' if os.name == 'posix' else 'cls')
     
 directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
@@ -1001,7 +1001,7 @@ def shortest_paths(ints):
                         hist.append(dir[2])
                         next_cell[2] = new_shortest
                         next_cell[3] = current_coords
-    print('hist', hist, 'len', len(hist))
+    # print('hist', hist, 'len', len(hist))
     return ints
 
 ints = shortest_paths(ints)
@@ -1027,6 +1027,151 @@ count += ints[-1][-1][1]
 # 902
 
 print('Solution n°17: ', count)
+
+######
+# 18 #
+######
+
+lines = []
+with open('data/input_18_x.txt') as f: 
+    for _ in f:
+        lines.append(_.replace('\n', '')) 
+        
+# lines = [
+#         'R 6 (#70c710)',
+#         'D 5 (#0dc571)',
+#         'L 2 (#5713f0)',
+#         'D 2 (#d2c081)',
+#         'R 2 (#59c680)',
+#         'D 2 (#411b91)',
+#         'L 5 (#8ceee2)',
+#         'U 2 (#caa173)',
+#         'L 1 (#1b58a2)',
+#         'U 2 (#caa171)',
+#         'R 2 (#7807d2)',
+#         'U 3 (#a77fa3)',
+#         'L 2 (#015232)',
+#         'U 2 (#7a21e3)'
+#         ]
+
+def clean_split(lines):
+    cleaned = []
+    for line in lines:
+        line = line.split(' ')
+        line[1] = int(line[1])
+        cleaned.append(line)
+    return cleaned
+
+lines = clean_split(lines)
+
+# def flood_fill(line):
+#     hash_indexes = [i for i, char in enumerate(line) if char == '#']
+#     valid_indexes = [x for x in hash_indexes if x + 1 not in hash_indexes or x - 1 not in hash_indexes]
+#     print('original', hash_indexes, 'valid indexes', valid_indexes)
+#     splitted_line = ['!']
+#     splitted_line += list(line)
+#     splitted_line.append('!')
+#     result = []
+#     for i in range(0, len(valid_indexes), 2):
+#         if i + 1 < len(valid_indexes):
+#             result.append((valid_indexes[i], valid_indexes[i + 1]))
+#         else:
+#             result.append((valid_indexes[i], len(line)))
+#     for tup in result:
+#         for i in range(tup[0], tup[1]):
+#             valid_indexes.append(i)
+#     valid_indexes = []
+#     hash_indexes += valid_indexes
+#     splitted_line = [x for x in splitted_line if x != '!']
+#     for index in hash_indexes:
+#         splitted_line[index] = '#'
+#     print('after', sorted(list(set(hash_indexes))))
+#     return ''.join(splitted_line)
+
+def flood_fill(line):
+    splitted_line = ['!']
+    splitted_line += list(line)
+    splitted_line.append('!')
+    valid_indexes = []
+    for i, char in enumerate(line):
+        between = False
+        if char == '#' and splitted_line[i + 2] != '#':
+            between = True
+        if char == '#' and splitted_line[i - 1] != '#' and splitted_line[i + 2] =='#':
+            between = True
+        if between == True:
+            valid_indexes.append(i)
+    print(line, '|', valid_indexes)
+            
+
+def draw_g(lines):
+    x_axis, y_axis = [], []
+    x, y = 0, 0
+    for line in lines:
+        if line[0] == 'R':
+            x += line[1]
+            x_axis.append(x)
+        if line[0] == 'L':
+            x -= line[1]
+            x_axis.append(x)
+        if line[0] == 'D':
+            y += line[1]
+            y_axis.append(y)
+        if line[0] == 'U':
+            y -= line[1]
+            y_axis.append(y)
+    x, y = max(x_axis), max(y_axis)
+    start = [0, 0]
+    coords = [(0, 0)]
+    for line in lines:
+        if line[0] == 'R':
+            for i in range(1, line[1] + 1):
+                start[0] += 1
+                coords.append((start[0], start[1]))
+        if line[0] == 'L':
+            for i in range(1, line[1] + 1):
+                start[0] -= 1
+                coords.append((start[0], start[1]))
+        if line[0] == 'D':
+            for i in range(1, line[1] + 1):
+                start[1] += 1
+                coords.append((start[0], start[1]))
+        if line[0] == 'U':
+            for i in range(1, line[1] + 1):
+                start[1] -= 1
+                coords.append((start[0], start[1]))
+    min_x = min([x[0] for x in coords]) * -1
+    min_y = min([x[1] for x in coords]) * -1
+    table = []
+    for i in range(y + 1 + min_y):
+        line = ''
+        for j in range(x + 1 + min_x):
+            line += '.'
+        table.append(line)
+    for coord in coords:
+        x, y = coord
+        x += min_x
+        y += min_y
+        table[y] = table[y][:x] + '#' + table[y][x + 1:]
+    filled_table = []
+    for line in table:
+        filled_table.append(flood_fill(line))
+    return filled_table
+
+table = draw_g(lines)
+
+for line in table:
+    print(line)
+
+count = 0
+for line in table:
+    for char in line:
+        if char == '#':
+            count += 1
+
+# 50746            
+print('Solution n°18: ', count)
+
 
         
         
