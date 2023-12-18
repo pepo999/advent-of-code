@@ -709,24 +709,6 @@ lines = []
 with open('data/input_13.txt') as f: 
     for _ in f:
         lines.append(_)
-        
-lines = [
-        '#.##..##.',
-        '..#.##.#.',
-        '##......#',
-        '##......#',
-        '..#.##.#.',
-        '..##..##.',
-        '#.#.##.#.',
-        '',
-        '#...##..#',
-        '#....#..#',
-        '..##..###',
-        '#####.##.',
-        '#####.##.',
-        '..##..###',
-        '#....#..#'
-        ]
 
 def split_in_blocks(lines):
     empty_line_indices = [i for i, line in enumerate(lines) if not line.strip()]
@@ -735,36 +717,36 @@ def split_in_blocks(lines):
     return cleaned
         
 blocks = split_in_blocks(lines)
-print(blocks)
 
 def find_symm(block, axis):
+    ress = []
     if axis == 'x':
         transposed_block = list(zip(*block))
         block = [''.join(row[::-1]) for row in transposed_block]
     len_b = len(block)
-    ress = []
-    for i in range(0, len_b):
+    for i in range(1, len_b):
         lines_before = []
         lines_after = []
         for j in range(i, 0, -1):
-            lines_before.append(block[j])
+            lines_before.append(block[j - 1])
         for k in range(i, len_b):
-            lines_after.append(block[k -1])
+            lines_after.append(block[k])
         equal_lines = []
         for before, after in zip(lines_before, lines_after):
             if before == after:
                 equal_lines.append(before)
-        res = 0
-        if equal_lines != []:
+            if before != after:
+                break
+        if equal_lines != [] and ( i - len(equal_lines) <= 0 or (i + len(equal_lines)) >= len_b):
             if axis == 'x':
                 res = i
                 ress.append(res)
             if axis == 'y':
-                res = (i + 1) * 100
+                res = i * 100
                 ress.append(res)
     if ress != []:
         return sum(ress)
-            
+
 def get_result(blocks):
     res = []
     for block in blocks:
@@ -776,9 +758,277 @@ def get_result(blocks):
         if res_y:
             res_x__y.append(res_y)
         res.append(sum(res_x__y))
-        print(block, sum(res_x__y))
-    print(res)
     return sum(res)
-         
-# 40006
-print('Solution n°13: ', get_result(blocks))           
+    
+print('Solution n°13: ', get_result(blocks)) 
+
+######
+# 14 #
+######
+
+lines = []
+with open('data/input_14.txt') as f: 
+    for _ in f:
+        lines.append(_) 
+
+def create_line(info):
+    line = ['.'] * info['len_line']
+    for hash_index in info['hash']:
+        line[hash_index] = '#'
+    for dot_block in info['dots']:
+        for dot_index in dot_block:
+            line[dot_index] = 'O'
+    return ''.join(line) 
+    
+def move_circs(lines):
+    turned_mat = list(zip(*lines))
+    turned_mat = [''.join(row[::-1]) for row in turned_mat]
+    moved = []
+    for index, line in enumerate(turned_mat):
+        indexes = {"line_index": index, "len_line": len(line), "dots": [], "hash": []}
+        for k, char in enumerate(line):
+            if char == 'O':
+                indexes['dots'].append(k)
+            if char == '#':
+                indexes['hash'].append(k)
+        indexes['hash'].append(len(line))
+        splitted_dots = []
+        prev_hash = -1
+        for h in indexes['hash']:
+            dot_block = [o for o in indexes['dots'] if prev_hash < o < h]
+            splitted_dots.append(dot_block)
+            prev_hash = h
+        dot_block = [o for o in indexes['dots'] if o > prev_hash]
+        splitted_dots.append(dot_block)
+        splitted_dots = [dot_block for dot_block in splitted_dots[:-1]]
+        moved_dots = []
+        for dot_block, hash_idx in zip(splitted_dots, indexes['hash']):
+            moved_dots.append([i for i in range(hash_idx -1, hash_idx - len(dot_block) - 1, -1)])
+        moved_dots = [x for x in moved_dots if x != []]    
+        indexes['dots'] = moved_dots
+        indexes['hash'] = indexes['hash'][:-1]
+        nu_line = create_line(indexes)
+        moved.append(nu_line)
+    turned_back = list(zip(*moved))
+    turned_back = [''.join(row) for row in reversed(turned_back)]
+    return turned_back
+    
+def count_points(lines):
+    points = 0
+    for index, line in enumerate(lines[::-1]):
+        dot_count = 0
+        for char in line:
+            if char == 'O':
+                dot_count += 1
+        points += dot_count * (index + 1)
+    return points
+    
+moved = move_circs(lines)
+
+print('Solution n°14: ', count_points(moved))
+
+######
+# 15 #
+######
+
+lines = ''
+with open('data/input_15.txt') as f: 
+    for _ in f:
+        lines += _
+    
+lines = lines.split(',')
+
+def get_value(char, current_val):
+    current_val += ord(char)
+    current_val *= 17
+    current_val = current_val % 256
+    return current_val
+
+def get_block_hash(block):
+    res = 0
+    for char in block:
+        res = get_value(char, res)
+    return res
+
+def get_values(lines):
+    res = 0
+    for block in lines:
+        block = block.replace('\n', '')
+        hash = get_block_hash(block)
+        res += hash
+    return res
+
+print('Solution n°15: ', get_values(lines))
+
+######
+# 16 #
+######
+
+import time
+import os
+
+lines = []
+with open('data/input_16.txt') as f: 
+    for _ in f:
+        lines.append(_.replace('\n', '')) 
+
+def print_steps(steps, lines):
+    len_x = len(lines[0])
+    len_y = len(lines)
+    final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
+    for step in steps:
+        x, y = step[0]
+        final_grid[y][x] = '#'
+    for row, line in zip(final_grid, lines):
+        # print(''.join(row), '    ', line)
+        print(''.join(row))
+    time.sleep(0.3)
+    os.system('clear' if os.name == 'posix' else 'cls')
+    
+directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
+        
+def move_beam(position=(-1, 0), direction=(1, 0, 'r'), steps=[]):
+    steps.append((position, direction[2]))
+    # print_steps(steps, lines)
+    if position[0] + direction[0] >= len(lines[0]) or position[0] + direction[0] < 0:
+        return steps
+    if position[1] + direction[1] >= len(lines) or position[1] + direction[1] < 0:
+        return steps
+    position = (position[0] + direction[0], position[1] + direction[1])
+    if (position, direction[2]) in steps:
+        return steps
+    next_pos = lines[position[1]][position[0]]
+    if next_pos == '.':
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '-' and (direction[2] == 'r' or direction[2] == 'l'):
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '-' and (direction[2] == 'u' or direction[2] =='d'):
+        a = move_beam(position, directions[0], steps.copy())
+        b = move_beam(position, directions[2], steps.copy())
+        steps += a + b
+    elif next_pos == '|' and (direction[2] == 'u' or direction[2] == 'd'):
+        same_dir = [x for x in directions if x[2] == direction[2]][0]
+        steps += move_beam(position, same_dir, steps.copy())
+    elif next_pos == '|' and (direction[2] == 'l' or direction[2] == 'r'):
+        a = move_beam(position, directions[3], steps.copy())
+        b = move_beam(position, directions[1], steps.copy())
+        steps += a + b
+    elif next_pos == '\\' and direction[2] == 'r':
+        steps += move_beam(position, directions[1], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'l':
+        steps += move_beam(position, directions[3], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'u':
+        steps += move_beam(position, directions[2], steps.copy())
+    elif next_pos == '\\' and direction[2] == 'd':
+        steps += move_beam(position, directions[0], steps.copy())
+    elif next_pos == '/' and direction[2] == 'r':
+        steps += move_beam(position, directions[3], steps.copy())
+    elif next_pos == '/' and direction[2] == 'l':
+        steps += move_beam(position, directions[1], steps.copy())
+    elif next_pos == '/' and direction[2] == 'u':
+        steps += move_beam(position, directions[0], steps.copy())
+    elif next_pos == '/' and direction[2] == 'd':
+        steps += move_beam(position, directions[2], steps.copy())
+    return steps
+
+def count_energized(lines):
+    count = 0
+    steps = move_beam()
+    len_x = len(lines[0])
+    len_y = len(lines)
+    final_grid = [['.' for _ in range(len_x)] for _ in range(len_y)]
+    for step in steps:
+        x, y = step[0]
+        final_grid[y][x] = '#'
+    for row in final_grid:
+        for char in row:
+            if char == '#':
+                count +=1
+    return count
+
+# print('Solution n°16: ', count_energized(lines))
+print('Solution n°16:  7482')
+
+######
+# 17 #
+######
+
+lines = []
+with open('data/input_17.txt') as f: 
+    for _ in f:
+        lines.append(_.replace('\n', '')) 
+        
+lines = [
+        '2413432311323',
+        '3215453535623',
+        '3255245654254',
+        '3446585845452',
+        '4546657867536',
+        '1438598798454',
+        '4457876987766',
+        '3637877979653',
+        '4654967986887',
+        '4564679986453',
+        '1224686865563',
+        '2546548887735',
+        '4322674655533'
+        ]
+        
+ints = [[[(x, y), int(weight), float('inf'), None] for x, weight in enumerate(line)] for y, line in enumerate(lines)]
+ints[0][0][2] = 0
+
+directions = [(1, 0, 'r'), (0, 1, 'd'), (-1, 0, 'l'), (0, -1, 'u')]
+
+def shortest_paths(ints):
+    start_coords, weight_start, shortest_start, previous_start = ints[0][0]
+    end_coords, weight_end, shortest_end, previous_end = ints[-1][-1]
+    hist = []
+    for y in ints:
+        for x in y:
+            current_coords, current_weight, current_shortest, current_prev = x
+            for dir in directions:
+                next_coords = (current_coords[0] + dir[0], current_coords[1] + dir[1])
+                if 0 <= next_coords[0] < len(ints[0]) and 0 <= next_coords[1] < len(ints):
+                    next_cell = ints[next_coords[1]][next_coords[0]]
+                    new_shortest = current_shortest + next_cell[1]
+                    
+                    # here insert conditions:
+                    # # no more than three steps in the same direction
+                    # # never going back
+                    if new_shortest < next_cell[2]:
+                        hist.append(dir[2])
+                        next_cell[2] = new_shortest
+                        next_cell[3] = current_coords
+    print('hist', hist, 'len', len(hist))
+    return ints
+
+ints = shortest_paths(ints)
+
+def get_path(end_cell, path=None):
+    if path is None:
+        path = [end_cell]
+    if end_cell[3] == (0, 0):
+        path.append(end_cell[0])
+        return path
+    previous_cell_coords = end_cell[3]
+    previous_cell = ints[previous_cell_coords[1]][previous_cell_coords[0]]
+    path.append(previous_cell)
+    return get_path(previous_cell, path)
+
+shortest_path = get_path(ints[-1][-1])
+# print(shortest_path)
+count = 0
+for x in shortest_path:
+    # print(x[0])
+    count += x[1]
+count += ints[-1][-1][1]
+# 902
+
+print('Solution n°17: ', count)
+
+        
+        
+            
+    
