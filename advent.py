@@ -776,7 +776,8 @@ def get_result(blocks):
         if res_y:
             res_x__y.append(res_y)
         res.append(sum(res_x__y))
-        print(block, res)
+        print(block, sum(res_x__y))
+    print(res)
     return sum(res)
          
 # 40006
