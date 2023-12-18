@@ -1095,13 +1095,11 @@ def flood_fill(line):
     valid_indexes = []
     for i, char in enumerate(line):
         between = False
-        if char == '#' and splitted_line[i + 2] != '#':
-            between = True
-        if char == '#' and splitted_line[i - 1] != '#' and splitted_line[i + 2] =='#':
-            between = True
-        if between == True:
+        # if (splitted_line[i -1] == '.' and splitted_line[ i + 2] == '.' and char == '#'):
+        #     valid_indexes.append(i)
+        if (splitted_line[i - 1] == '.' or splitted_line[i + 2] == '.' or splitted_line[i - 1] == '!' or splitted_line[i +2] == '!') and char == '#':
             valid_indexes.append(i)
-    print(line, '|', valid_indexes)
+    print(line, '|', valid_indexes[:10], '...')
             
 
 def draw_g(lines):
