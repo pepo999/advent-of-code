@@ -1064,44 +1064,6 @@ def clean_split(lines):
 
 lines = clean_split(lines)
 
-# def flood_fill(line):
-#     hash_indexes = [i for i, char in enumerate(line) if char == '#']
-#     valid_indexes = [x for x in hash_indexes if x + 1 not in hash_indexes or x - 1 not in hash_indexes]
-#     print('original', hash_indexes, 'valid indexes', valid_indexes)
-#     splitted_line = ['!']
-#     splitted_line += list(line)
-#     splitted_line.append('!')
-#     result = []
-#     for i in range(0, len(valid_indexes), 2):
-#         if i + 1 < len(valid_indexes):
-#             result.append((valid_indexes[i], valid_indexes[i + 1]))
-#         else:
-#             result.append((valid_indexes[i], len(line)))
-#     for tup in result:
-#         for i in range(tup[0], tup[1]):
-#             valid_indexes.append(i)
-#     valid_indexes = []
-#     hash_indexes += valid_indexes
-#     splitted_line = [x for x in splitted_line if x != '!']
-#     for index in hash_indexes:
-#         splitted_line[index] = '#'
-#     print('after', sorted(list(set(hash_indexes))))
-#     return ''.join(splitted_line)
-
-def flood_fill(line):
-    splitted_line = ['!']
-    splitted_line += list(line)
-    splitted_line.append('!')
-    valid_indexes = []
-    for i, char in enumerate(line):
-        between = False
-        # if (splitted_line[i -1] == '.' and splitted_line[ i + 2] == '.' and char == '#'):
-        #     valid_indexes.append(i)
-        if (splitted_line[i - 1] == '.' or splitted_line[i + 2] == '.' or splitted_line[i - 1] == '!' or splitted_line[i +2] == '!') and char == '#':
-            valid_indexes.append(i)
-    print(line, '|', valid_indexes[:10], '...')
-            
-
 def draw_g(lines):
     x_axis, y_axis = [], []
     x, y = 0, 0
@@ -1151,15 +1113,30 @@ def draw_g(lines):
         x += min_x
         y += min_y
         table[y] = table[y][:x] + '#' + table[y][x + 1:]
-    filled_table = []
-    for line in table:
-        filled_table.append(flood_fill(line))
-    return filled_table
+    return table, coords
 
-table = draw_g(lines)
+def fill_flood(cell, table):
+    x, y = cell
+    table[y][x] == '#'
+    if table[y][x + 1] == '.':
+        return fill_flood((x + 1, y), table)
+    elif table[y + 1][x] == '.':
+        return fill_flood((x, y + 1), table)
+    elif table[y][x - 1] == '.':
+        return fill_flood((x - 1, y), table)
+    elif table[y - 1][x] == '.':
+        return fill_flood((x, y - 1), table)
+    return table
+    
 
-for line in table:
-    print(line)
+table, coords = draw_g(lines)
+
+center = (len(table[0])//2, len(table)//2)
+
+table = fill_flood(center, table)
+
+# for line in table:
+#     print(line)
 
 count = 0
 for line in table:
