@@ -1033,7 +1033,7 @@ print('Solution n°17: ', count)
 ######
 
 lines = []
-with open('data/input_18_x.txt') as f: 
+with open('data/input_18.txt') as f: 
     for _ in f:
         lines.append(_.replace('\n', '')) 
 
@@ -1106,13 +1106,11 @@ def fill_flood(table, cell, old, new, print_t):
          return 
     table[y][x] = new
     if print_t:
-        for line in table:
+        for line in table[len(table) - 185:]:
             print(''.join(line))
         print('\n' * 5)
-        sys.stdout.write('\033[H')  # Move the cursor to the beginning of the terminal
+        sys.stdout.write('\033[H')
         sys.stdout.flush()
-        time.sleep(0.01)
-        # os.system('clear' if os.name == 'posix' else 'cls')
     if x + 1 < len(table[0]) - 1:
         fill_flood(table, (x + 1, y), old, new, print_t)
     if y + 1 < len(table) - 1:
@@ -1128,19 +1126,109 @@ center = (len(table[0])//2, len(table)//2 + 1)
 
 table = [[x for x in y] for y in table]
 
-fill_flood(table, center, None, '#', print_t=True)
-
-for line in table:
-    print(''.join(line))
+# fill_flood(table, center, None, '#', print_t=False)
 
 count = 0
 for line in table:
     for char in line:
         if char == '#':
             count += 1
+        
+# print('Solution n°18: ', count)
+print('Solution n°18:  50746')
 
-# 50746            
-print('Solution n°18: ', count)
+######
+# 19 #
+######
+
+workflows = {}
+part_ratings = []
+
+with open('data/input_19.txt') as f: 
+    parts = False
+    for _ in f:
+        if _ == '\n':
+            parts = True
+        if parts and _ != '\n':
+            part = _.replace('{', '').replace('}', '').replace('\n', '').split(',')
+            part_list = {}
+            for block in part:
+                block = block.split('=')
+                part_list[block[0]] = int(block[1])
+            part_ratings.append(part_list)
+        elif not parts and _ != '\n':
+            _ = _.replace('\n', '')
+            name = _.split('{')[0]
+            rules = _.split('{')[1].replace('}', '').split(',')
+            for i, rule in enumerate(rules):
+                if not any([x.isdigit() for x in rule]):
+                    rules[i - 1] += f',{rule}'
+                    rules.pop(i)
+            formatted_rules = []
+            for rule in rules:
+                rating = re.split('[<>:]', rule)
+                operator = '>'
+                if '<' in rule:
+                    operator = '<'
+                formatted_rule = (rating[0], operator, int(rating[1]), ':', rating[2].split(','))
+                formatted_rules.append(formatted_rule)    
+            workflows[name] = formatted_rules
+    
+start = [x for x in workflows if 'in' in x]   
+
+def a_or_r(part_rating, work_name='in', res=None):
+    x, m, a, s = part_rating.values()
+    if res == 'A':
+        return x+m+a+s 
+    if res == 'R':
+        return 'R'
+    start = workflows.get(work_name)
+    for workflow in start:
+        variable, operator, value = workflow[:3]
+        variable = part_rating.get(variable)
+        do = workflow[4][0]
+        el = None
+        if len(workflow[4]) > 1:
+            el = workflow[4][1]
+        condition = None
+        if operator == '<':
+            condition = variable < value
+        elif operator == '>':
+            condition = variable > value
+        elif operator == '<=':
+            condition = variable <= value
+        elif operator == '>=':
+            condition = variable >= value
+        elif operator == '==':
+            condition = variable == value
+        elif operator == '!=':
+            condition = variable != value  
+        # print(workflow[0], workflow[1], workflow[2], ':', condition, '-->', workflow[4]) 
+        if condition:
+            if len(do) >= 2:
+                # print(f'a_or_r({part_rating}, {do})')
+                return a_or_r(part_rating, do)
+            else:
+                # print(f'a_or_r({part_rating}, {do})')
+                return a_or_r(part_rating, do, do)
+        if not condition:
+            if el:
+                if len(el) >= 2:
+                    # print(f'a_or_r({part_rating}, {el}) --> {a_or_r(part_rating, do, do)}')
+                    return a_or_r(part_rating, el)
+                else:
+                    # print(f'a_or_r({part_rating}, {el}) --> {a_or_r(part_rating, el, el)}')
+                    return a_or_r(part_rating, el, el)
+
+res = 0            
+for part_rating in part_ratings:
+    # print('##########RATING', part_rating)
+    # print(a_or_r(part_rating))
+    # print('          ')
+    if str(a_or_r(part_rating)).isdigit():
+        res += a_or_r(part_rating)
+        
+print('Solution n°19: ', res)
 
 
         
