@@ -1203,28 +1203,20 @@ def a_or_r(part_rating, work_name='in', res=None):
             condition = variable == value
         elif operator == '!=':
             condition = variable != value  
-        # print(workflow[0], workflow[1], workflow[2], ':', condition, '-->', workflow[4]) 
         if condition:
             if len(do) >= 2:
-                # print(f'a_or_r({part_rating}, {do})')
                 return a_or_r(part_rating, do)
             else:
-                # print(f'a_or_r({part_rating}, {do})')
                 return a_or_r(part_rating, do, do)
         if not condition:
             if el:
                 if len(el) >= 2:
-                    # print(f'a_or_r({part_rating}, {el}) --> {a_or_r(part_rating, do, do)}')
                     return a_or_r(part_rating, el)
                 else:
-                    # print(f'a_or_r({part_rating}, {el}) --> {a_or_r(part_rating, el, el)}')
                     return a_or_r(part_rating, el, el)
 
 res = 0            
 for part_rating in part_ratings:
-    # print('##########RATING', part_rating)
-    # print(a_or_r(part_rating))
-    # print('          ')
     if str(a_or_r(part_rating)).isdigit():
         res += a_or_r(part_rating)
         
