@@ -1195,14 +1195,6 @@ def a_or_r(part_rating, work_name='in', res=None):
             condition = variable < value
         elif operator == '>':
             condition = variable > value
-        elif operator == '<=':
-            condition = variable <= value
-        elif operator == '>=':
-            condition = variable >= value
-        elif operator == '==':
-            condition = variable == value
-        elif operator == '!=':
-            condition = variable != value  
         if condition:
             if len(do) >= 2:
                 return a_or_r(part_rating, do)
