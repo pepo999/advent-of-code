@@ -1177,9 +1177,9 @@ with open('data/input_19.txt') as f:
 start = [x for x in workflows if 'in' in x]   
 
 def a_or_r(part_rating, work_name='in', res=None):
-    x, m, a, s = part_rating.values()
+    xmas = sum(part_rating.values())
     if res == 'A':
-        return x+m+a+s 
+        return xmas
     if res == 'R':
         return 'R'
     start = workflows.get(work_name)
@@ -1215,12 +1215,14 @@ def a_or_r(part_rating, work_name='in', res=None):
                 else:
                     return a_or_r(part_rating, el, el)
 
-res = 0            
-for part_rating in part_ratings:
-    if str(a_or_r(part_rating)).isdigit():
-        res += a_or_r(part_rating)
+def sum_ratings(part_ratings):
+    res = 0            
+    for part_rating in part_ratings:
+        if a_or_r(part_rating) != 'R':
+            res += a_or_r(part_rating)
+    return res
         
-print('Solution n°19: ', res)
+print('Solution n°19: ', sum_ratings(part_ratings))
 
 
         
