@@ -1036,23 +1036,6 @@ lines = []
 with open('data/input_18_x.txt') as f: 
     for _ in f:
         lines.append(_.replace('\n', '')) 
-        
-# lines = [
-#         'R 6 (#70c710)',
-#         'D 5 (#0dc571)',
-#         'L 2 (#5713f0)',
-#         'D 2 (#d2c081)',
-#         'R 2 (#59c680)',
-#         'D 2 (#411b91)',
-#         'L 5 (#8ceee2)',
-#         'U 2 (#caa173)',
-#         'L 1 (#1b58a2)',
-#         'U 2 (#caa171)',
-#         'R 2 (#7807d2)',
-#         'U 3 (#a77fa3)',
-#         'L 2 (#015232)',
-#         'U 2 (#7a21e3)'
-#         ]
 
 def clean_split(lines):
     cleaned = []
@@ -1115,28 +1098,40 @@ def draw_g(lines):
         table[y] = table[y][:x] + '#' + table[y][x + 1:]
     return table, coords
 
-def fill_flood(cell, table):
+def fill_flood(table, cell, old, new, print_t):
     x, y = cell
-    table[y][x] == '#'
-    if table[y][x + 1] == '.':
-        return fill_flood((x + 1, y), table)
-    elif table[y + 1][x] == '.':
-        return fill_flood((x, y + 1), table)
-    elif table[y][x - 1] == '.':
-        return fill_flood((x - 1, y), table)
-    elif table[y - 1][x] == '.':
-        return fill_flood((x, y - 1), table)
-    return table
-    
+    if old == None:
+        old = table[y][x]
+    if table[y][x] != old:
+         return 
+    table[y][x] = new
+    if print_t:
+        for line in table:
+            print(''.join(line))
+        print('\n' * 5)
+        sys.stdout.write('\033[H')  # Move the cursor to the beginning of the terminal
+        sys.stdout.flush()
+        time.sleep(0.01)
+        # os.system('clear' if os.name == 'posix' else 'cls')
+    if x + 1 < len(table[0]) - 1:
+        fill_flood(table, (x + 1, y), old, new, print_t)
+    if y + 1 < len(table) - 1:
+        fill_flood(table, (x, y + 1), old, new, print_t)
+    if x - 1 > 0:
+        fill_flood(table, (x - 1, y), old, new, print_t)
+    if y - 1 > 0:
+        fill_flood(table, (x, y - 1), old, new, print_t)
 
 table, coords = draw_g(lines)
 
-center = (len(table[0])//2, len(table)//2)
+center = (len(table[0])//2, len(table)//2 + 1)
 
-table = fill_flood(center, table)
+table = [[x for x in y] for y in table]
 
-# for line in table:
-#     print(line)
+fill_flood(table, center, None, '#', print_t=True)
+
+for line in table:
+    print(''.join(line))
 
 count = 0
 for line in table:
