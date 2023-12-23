@@ -1216,6 +1216,273 @@ def sum_ratings(part_ratings):
         
 print('Solution n°19: ', sum_ratings(part_ratings))
 
+######
+# 20 #
+######
+
+formatted_input = []
+with open('data/input_20_1.txt') as f:
+    for _ in f:
+        _ = _.replace('\n', '').split('-> ')
+        type_name = _[0]
+        cell = []
+        if type_name[0] == '%':
+            cell = [type_name[1:].strip(), '%', 0, _[1].split(', ')]
+        if type_name[0] == '&':
+            cell = [type_name[1:].strip(), '&', {}, _[1].split(', ')]
+        if 'broadcaster' in type_name:
+            cell = ['broadcaster', '', '', _[1].split(', ')]
+        formatted_input.append(cell)
+
+
+def create_memory_conjs():
+    conjs = [x for x in formatted_input if x[1] == '&']
+    outs = [[x[0], x[3]] for x in formatted_input]
+    for conj in conjs:
+        for out in outs:
+            out_names = out[1]
+            for out_name in out_names:
+                if conj[0] == out_name:
+                    conj[2][out[0]] = 0
+            
+create_memory_conjs()
+
+tot_pulses = [0, 0]
+
+def current(cell_name, in_signal, started=False):
+    cell = [x for x in formatted_input if x[0] == cell_name][0]
+    print('curr cell', cell, 'in signal', in_signal)
+    print(tot_pulses)
+    flip_states = sum([x[2] for x in formatted_input if x[1] == '%'])
+    ###### END CONDITIONS
+    if started == True and flip_states == 0:
+        print('all flips off')
+        return
+    started = True
+    if cell[3][0] not in [x[0] for x in formatted_input]:
+        print('escape cell reached')
+        return
+    ####### SIGNAL PROCESSING
+    out_signal = None
+    if cell[1] == '%':
+        if in_signal == 0:
+            if cell[2] == 0:
+                out_cells = [x for x in formatted_input if x[0] in cell[3]]
+                for out_cell in out_cells:
+                    pass
+                    out_cell[2] ^= 1
+                for out_cell_name in cell[3]:
+                    tot_pulses[1] += 1
+                    current(out_cell_name, 1, started=True)
+            if cell[2] == 1:
+                for out_cell_name in cell[3]:
+                    tot_pulses[0] += 1
+                    current(out_cell_name, 0, started=True)
+    if cell[1] == '&':
+        signals = cell[2].values()
+        signals = list(signals)
+        if sum(signals) < len(signals):
+            out_signal = 1
+        else:
+            out_signal = 0
+        for out_cell_name in cell[3]:
+            out_cell = [x for x in formatted_input if x[0] == out_cell_name][0]
+            if out_signal == 0 and out_cell[2] == 0:
+                out_cell[2] ^= 1
+            tot_pulses[out_signal] += 1
+            print(f'current({out_cell_name, {out_signal}})')
+            current(out_cell_name, out_signal, started=True)
+    if cell[0] == 'broadcaster':
+        out_signal = in_signal
+        out_cells = [x for x in formatted_input if x[0] in cell[3]]
+        for out_cell in out_cells:
+            if out_signal == 0 and out_cell[2] == 0:
+                out_cell[2] ^= 1
+        for out_cell_name in cell[3]: 
+            tot_pulses[out_signal] += 1
+            current(out_cell_name, out_signal, started=True)
+
+# current('broadcaster', 0)
+print('Solution n°20:  -----')
+
+######
+# 21 #
+######
+
+lines = []
+with open('data/input_21.txt') as f:
+    for _ in f:
+        lines.append(_.replace('\n', ''))
+    
+def get_coords(char, lines):
+    coords = []
+    for y, line in enumerate(lines):
+        for x, letter in enumerate(line):
+            if letter == char:
+                coords.append((x, y, char))
+    return coords
+
+start_x, start_y, char = get_coords('S', lines)[0]
+    
+def move(start_x, start_y, steps):
+    global plots
+    if plots == None:
+        plots = {}
+        for i in range(-1, steps + 1):
+            plots[i + 1] = set()
+    plots[steps + 1].add((start_x, start_y))
+    if steps <= 0:
+        return len(plots[1])
+    if start_x - 1 >= 0:
+        left = lines[start_y][start_x - 1]
+        if left == '.' or left == 'S':
+            plots[steps].add((start_x - 1, start_y))
+    if start_x + 1 <= len(lines[0]) - 1:
+        right = lines[start_y][start_x +1]
+        if right == '.' or right == 'S':
+            plots[steps].add((start_x + 1, start_y))
+    if start_y - 1 >= 0:
+        up = lines[start_y - 1][start_x]
+        if up == '.' or up == 'S':
+            plots[steps].add((start_x, start_y -1))
+    if start_y + 1 <= len(lines) - 1:
+        down = lines[start_y + 1][start_x]
+        if down == '.' or down == 'S':
+            plots[steps].add((start_x, start_y + 1))
+    for to_visit in plots[steps]:
+        move(to_visit[0], to_visit[1], steps - 1) 
+
+plots = None   
+# move(start_x, start_y, 64)
+# print('Solution n°21: ', len(plots[1]))
+print('Solution n°21:  -----')
+
+######
+# 22 #
+######
+
+import copy
+
+lines = []
+max_x = 0
+max_y = 0
+max_z = 0
+
+with open('data/input_22.txt') as f:
+    f = sorted(list(f), key = lambda x : x.replace('\n', '').split(',')[-1])
+    for i, _ in enumerate(f, 1):
+        _ = _.replace('\n', '').split('~')
+        for coord in _:
+            coord = coord.split(',')
+            if coord[0].isdigit() and int(coord[0]) > max_x:
+                max_x = int(coord[0])
+            if coord[1].isdigit() and int(coord[1]) > max_y:
+                max_y = int(coord[1])
+            if coord[2].isdigit() and int(coord[2]) > max_z:
+                max_z = int(coord[2])
+        x = _[0].split(',')
+        y = _[1].split(',')
+        x = [int(_) for _ in x]
+        y = [int(_) for _ in y]
+        lines.append((x, y, str(i)))
+
+front = [['.' for x in range(max_x + 1)] for z in range(max_z + 1)]
+side = [['.' for y in range(max_y + 1)] for z in range(max_z + 1)]
+
+front[0] = '-' * len(front[0])
+side[0] = '-' * len(side[0])
+
+coords ={}
+
+for line in lines:
+    start_front = [line[0][0], line[0][2]]
+    end_front = [line[1][0], line[1][2]]
+    start_side = [line[0][1], line[0][2]]
+    end_side = [line[1][1], line[1][2]]
+    char = line[2]
+    coords[char +'f'] = []
+    coords[char +'s'] = []
+    for x in range(start_front[0], end_front[0] + 1):
+        for z in range(start_front[1], end_front[1] + 1):
+            coords[char + 'f'].append((x, z))
+            front[z][x] = '#'
+    for y in range(start_side[0], end_side[0] + 1):
+        for z in range(start_side[1], end_side[1] + 1):
+            coords[char +'s'].append((y, z))
+            side[z][y] = '#'
+            
+front_old = copy.deepcopy(front)
+side_old = copy.deepcopy(side)
+
+def fall(brick, id):
+    can_fall = False
+    coords_f = brick[0]
+    coords_s = brick[1]
+    min_z = min([x[1] for x in coords_f])
+    front_bool = []
+    for i in range(len(coords_f)):
+        front_bool.append(False)
+    for i, coord in enumerate(coords_f):
+        if front[min_z - 1][coord[0]] == '.':
+            front_bool[i] = True
+    side_bool = []
+    for i in range(len(coords_s)):
+        side_bool.append(False)
+    for i, coord in enumerate(coords_s):
+        if side[min_z - 1][coord[0]] == '.':
+            side_bool[i] = True
+    if all(front_bool) == True or all(side_bool) == True:
+        can_fall = True
+    if can_fall:
+        new_coords_f = []
+        for coord in coords_f:
+            front[coord[1]][coord[0]] = '.'
+        for coord in coords_f:
+            front[coord[1]- 1][coord[0]] = '#'
+            new_coords_f.append((coord[0], coord[1]- 1)) 
+        coords[id + 'f'] = new_coords_f 
+        new_coords_s = []
+        for coord in coords_s:
+            side[coord[1]][coord[0]] = '.'
+        for coord in coords_s:
+            side[coord[1]- 1][coord[0]] = '#'
+            new_coords_s.append((coord[0], coord[1]-1))
+        coords[id + 's'] = new_coords_s 
+    else: 
+        return
+
+def gravity(coords_arg): 
+    coords_arg_old = copy.deepcopy(coords_arg)            
+    for i in range(len(coords_arg)//2):
+        i = str(i + 1) 
+        coord_f = coords_arg[i + 'f']
+        coord_s = coords_arg[i +'s']
+        brick = [coord_f, coord_s]
+        fall(brick, i)
+    if coords_arg_old == coords:
+        return
+    else:
+        gravity(coords)
+            
+gravity(coords)
+gravity(coords)
+
+for line_front, line_side, line_front_old, line_side_old in zip(front[::-1], side[::-1], front_old[::-1], side_old[::-1]):
+    print(''.join(line_front), ' | ', ''.join(line_side), ' ||| ', ''.join(line_front_old), ' | ', ''.join(line_side_old))  
+
+# print(coords)
+           
+
+
+    
+
+
+        
+
+        
+
+
+
 
         
         
